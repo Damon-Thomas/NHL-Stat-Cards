@@ -87,3 +87,23 @@
   color: #666;
   font-size: 12px;
 }
+
+.card-count {
+  margin: 20px 0;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.card-count p {
+  margin: 0;
+  font-size: 16px;
+  color: #495057;
+}
+
+.card-count strong {
+  color: #007bff;
+  font-size: 18px;
+}

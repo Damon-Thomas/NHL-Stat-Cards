@@ -120,10 +120,12 @@ function App() {
   const [roster, setRoster] = useState<Player[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
+  const [cardCount, setCardCount] = useState<number>(0);
 
   // Fetch all NHL teams on component mount
   useEffect(() => {
     fetchTeams();
+    getCount();
   }, []);
 
   const fetchTeams = async () => {
@@ -190,9 +192,39 @@ function App() {
     }
   };
 
+  // Just to display it
+  const getCount = async () => {
+    try {
+      const res = await fetch("/api/get-count");
+      const json = await res.json();
+      console.log("Total player cards created:", json.count);
+      setCardCount(json.count);
+    } catch (err) {
+      console.error("Failed to fetch card count:", err);
+    }
+  };
+
+  // useEffect or after card creation
+  const incrementCount = async () => {
+    try {
+      const res = await fetch("/api/increment");
+      const json = await res.json();
+      console.log("New count:", json.count);
+      setCardCount(json.count);
+    } catch (err) {
+      console.error("Failed to increment card count:", err);
+    }
+  };
+
   return (
     <div className="app">
       <h1>NHL Stat Cards</h1>
+
+      <div className="card-count">
+        <p>
+          Total Player Cards Created: <strong>{cardCount}</strong>
+        </p>
+      </div>
 
       {error && <div className="error">Error: {error}</div>}
 
