@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/get-teams.ts": {
+      "runtime": "@vercel/node@3.0.0"
+    },
+    "api/get-roster.ts": {
+      "runtime": "@vercel/node@3.0.0"
+    }
+  }
+}
