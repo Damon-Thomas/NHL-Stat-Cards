@@ -493,7 +493,9 @@ function App() {
             {playerCardData.competition && (
               <div className="stat-item">
                 <span className="stat-label">Competition:</span>
-                <span className="stat-value">{playerCardData.competition}</span>
+                <span className="stat-value">
+                  {playerCardData.competition}
+                </span>
               </div>
             )}
             {playerCardData.teammates && (
@@ -638,6 +640,568 @@ function App() {
         </div>
       </div>
     );
+          <div className="player-card-header">
+            <div className="player-card-title">
+              <div className="player-card-images">
+                <img
+                  src={player.headshot}
+                  alt={`${player.firstName.default} ${player.lastName.default}`}
+                  className="player-headshot"
+                />
+                {selectedTeamInfo && (
+                  <img
+                    src={selectedTeamInfo.teamLogo}
+                    alt={selectedTeamInfo.teamName.default}
+                    className="team-logo"
+                  />
+                )}
+              </div>
+              <h2 className="player-card-name">
+                {player.firstName.default} {player.lastName.default}
+              </h2>
+              {selectedTeamInfo && (
+                <div className="player-card-team">
+                  {selectedTeamInfo.teamName.default}
+                </div>
+              )}
+            </div>
+            <div className="player-card-number">#{player.sweaterNumber}</div>
+          </div>
+
+          <div className="player-card-stats">
+            <div className="stat-group">
+              <h3>Basic Info</h3>
+              <div className="stat-item">
+                <span className="stat-label">Position:</span>
+                <span className="stat-value">{player.positionCode}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Shoots/Catches:</span>
+                <span className="stat-value">{player.shootsCatches}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Age:</span>
+                <span className="stat-value">{age}</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Height:</span>
+                <span className="stat-value">
+                  {heightFeet}'{heightInches}"
+                </span>
+              </div>
+            </div>
+
+            {/* Advanced Stats */}
+            <div className="stat-group">
+              <h3>Advanced Stats</h3>
+              {playerCardData.projWAR && (
+                <div className="stat-item">
+                  <span className="stat-label">Proj. WAR:</span>
+                  <span className="stat-value">{playerCardData.projWAR}</span>
+                </div>
+              )}
+              {playerCardData.evOffence && (
+                <div className="stat-item">
+                  <span className="stat-label">EV Offence:</span>
+                  <span className="stat-value">{playerCardData.evOffence}</span>
+                </div>
+              )}
+              {playerCardData.evDefence && (
+                <div className="stat-item">
+                  <span className="stat-label">EV Defence:</span>
+                  <span className="stat-value">{playerCardData.evDefence}</span>
+                </div>
+              )}
+              {playerCardData.pp && (
+                <div className="stat-item">
+                  <span className="stat-label">PP:</span>
+                  <span className="stat-value">{playerCardData.pp}</span>
+                </div>
+              )}
+              {playerCardData.pk && (
+                <div className="stat-item">
+                  <span className="stat-label">PK:</span>
+                  <span className="stat-value">{playerCardData.pk}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Performance Stats */}
+            <div className="stat-group">
+              <h3>Performance</h3>
+              {playerCardData.finishing && (
+                <div className="stat-item">
+                  <span className="stat-label">Finishing:</span>
+                  <span className="stat-value">{playerCardData.finishing}</span>
+                </div>
+              )}
+              {playerCardData.goals && (
+                <div className="stat-item">
+                  <span className="stat-label">Goals:</span>
+                  <span className="stat-value">{playerCardData.goals}</span>
+                </div>
+              )}
+              {playerCardData.firstAssists && (
+                <div className="stat-item">
+                  <span className="stat-label">1st Assists:</span>
+                  <span className="stat-value">
+                    {playerCardData.firstAssists}
+                  </span>
+                </div>
+              )}
+              {playerCardData.penalties && (
+                <div className="stat-item">
+                  <span className="stat-label">Penalties:</span>
+                  <span className="stat-value">{playerCardData.penalties}</span>
+                </div>
+              )}
+              {playerCardData.competition && (
+                <div className="stat-item">
+                  <span className="stat-label">Competition:</span>
+                  <span className="stat-value">
+                    {playerCardData.competition}
+                  </span>
+                </div>
+              )}
+              {playerCardData.teammates && (
+                <div className="stat-item">
+                  <span className="stat-label">Teammates:</span>
+                  <span className="stat-value">{playerCardData.teammates}</span>
+                </div>
+              )}
+            </div>
+
+            {/* WAR Percentile Rankings */}
+            {(playerCardData.warPercentileRankYr1 ||
+              playerCardData.warPercentileRankYr2 ||
+              playerCardData.warPercentileRankYr3) && (
+              <div className="stat-group">
+                <h3>WAR Percentile Rank</h3>
+                {playerCardData.warPercentileRankYr1 && (
+                  <div className="stat-item">
+                    <span className="stat-label">Year 1:</span>
+                    <span className="stat-value">
+                      {playerCardData.warPercentileRankYr1}
+                    </span>
+                  </div>
+                )}
+                {playerCardData.warPercentileRankYr2 && (
+                  <div className="stat-item">
+                    <span className="stat-label">Year 2:</span>
+                    <span className="stat-value">
+                      {playerCardData.warPercentileRankYr2}
+                    </span>
+                  </div>
+                )}
+                {playerCardData.warPercentileRankYr3 && (
+                  <div className="stat-item">
+                    <span className="stat-label">Year 3:</span>
+                    <span className="stat-value">
+                      {playerCardData.warPercentileRankYr3}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Offense by Year */}
+            {(playerCardData.offenseYr1 ||
+              playerCardData.offenseYr2 ||
+              playerCardData.offenseYr3) && (
+              <div className="stat-group">
+                <h3>Offense by Year</h3>
+                {playerCardData.offenseYr1 && (
+                  <div className="stat-item">
+                    <span className="stat-label">Year 1:</span>
+                    <span className="stat-value">
+                      {playerCardData.offenseYr1}
+                    </span>
+                  </div>
+                )}
+                {playerCardData.offenseYr2 && (
+                  <div className="stat-item">
+                    <span className="stat-label">Year 2:</span>
+                    <span className="stat-value">
+                      {playerCardData.offenseYr2}
+                    </span>
+                  </div>
+                )}
+                {playerCardData.offenseYr3 && (
+                  <div className="stat-item">
+                    <span className="stat-label">Year 3:</span>
+                    <span className="stat-value">
+                      {playerCardData.offenseYr3}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Defense by Year */}
+            {(playerCardData.defenseYr1 ||
+              playerCardData.defenseYr2 ||
+              playerCardData.defenseYr3) && (
+              <div className="stat-group">
+                <h3>Defense by Year</h3>
+                {playerCardData.defenseYr1 && (
+                  <div className="stat-item">
+                    <span className="stat-label">Year 1:</span>
+                    <span className="stat-value">
+                      {playerCardData.defenseYr1}
+                    </span>
+                  </div>
+                )}
+                {playerCardData.defenseYr2 && (
+                  <div className="stat-item">
+                    <span className="stat-label">Year 2:</span>
+                    <span className="stat-value">
+                      {playerCardData.defenseYr2}
+                    </span>
+                  </div>
+                )}
+                {playerCardData.defenseYr3 && (
+                  <div className="stat-item">
+                    <span className="stat-label">Year 3:</span>
+                    <span className="stat-value">
+                      {playerCardData.defenseYr3}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Finishing by Year */}
+            {(playerCardData.finishingYr1 ||
+              playerCardData.finishingYr2 ||
+              playerCardData.finishingYr3) && (
+              <div className="stat-group">
+                <h3>Finishing by Year</h3>
+                {playerCardData.finishingYr1 && (
+                  <div className="stat-item">
+                    <span className="stat-label">Year 1:</span>
+                    <span className="stat-value">
+                      {playerCardData.finishingYr1}
+                    </span>
+                  </div>
+                )}
+                {playerCardData.finishingYr2 && (
+                  <div className="stat-item">
+                    <span className="stat-label">Year 2:</span>
+                    <span className="stat-value">
+                      {playerCardData.finishingYr2}
+                    </span>
+                  </div>
+                )}
+                {playerCardData.finishingYr3 && (
+                  <div className="stat-item">
+                    <span className="stat-label">Year 3:</span>
+                    <span className="stat-value">
+                      {playerCardData.finishingYr3}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="player-card-form">
+          <h3>Player Statistics</h3>
+          <div className="form-sections">
+            <div className="form-section">
+              <h4>Advanced Stats</h4>
+              <div className="form-row">
+                <label>
+                  Proj. WAR:
+                  <input
+                    type="text"
+                    value={playerCardData.projWAR}
+                    onChange={(e) =>
+                      handleInputChange("projWAR", e.target.value)
+                    }
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+              </div>
+              <div className="form-row">
+                <label>
+                  EV Offence:
+                  <input
+                    type="text"
+                    value={playerCardData.evOffence}
+                    onChange={(e) =>
+                      handleInputChange("evOffence", e.target.value)
+                    }
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+                <label>
+                  EV Defence:
+                  <input
+                    type="text"
+                    value={playerCardData.evDefence}
+                    onChange={(e) =>
+                      handleInputChange("evDefence", e.target.value)
+                    }
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+              </div>
+              <div className="form-row">
+                <label>
+                  PP:
+                  <input
+                    type="text"
+                    value={playerCardData.pp}
+                    onChange={(e) => handleInputChange("pp", e.target.value)}
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+                <label>
+                  PK:
+                  <input
+                    type="text"
+                    value={playerCardData.pk}
+                    onChange={(e) => handleInputChange("pk", e.target.value)}
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className="form-section">
+              <h4>Performance</h4>
+              <div className="form-row">
+                <label>
+                  Finishing:
+                  <input
+                    type="text"
+                    value={playerCardData.finishing}
+                    onChange={(e) =>
+                      handleInputChange("finishing", e.target.value)
+                    }
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+                <label>
+                  Goals:
+                  <input
+                    type="text"
+                    value={playerCardData.goals}
+                    onChange={(e) => handleInputChange("goals", e.target.value)}
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+              </div>
+              <div className="form-row">
+                <label>
+                  1st Assists:
+                  <input
+                    type="text"
+                    value={playerCardData.firstAssists}
+                    onChange={(e) =>
+                      handleInputChange("firstAssists", e.target.value)
+                    }
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+                <label>
+                  Penalties:
+                  <input
+                    type="text"
+                    value={playerCardData.penalties}
+                    onChange={(e) =>
+                      handleInputChange("penalties", e.target.value)
+                    }
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+              </div>
+              <div className="form-row">
+                <label>
+                  Competition:
+                  <input
+                    type="text"
+                    value={playerCardData.competition}
+                    onChange={(e) =>
+                      handleInputChange("competition", e.target.value)
+                    }
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+                <label>
+                  Teammates:
+                  <input
+                    type="text"
+                    value={playerCardData.teammates}
+                    onChange={(e) =>
+                      handleInputChange("teammates", e.target.value)
+                    }
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className="form-section">
+              <h4>WAR Percentile Rank</h4>
+              <div className="form-row">
+                <label>
+                  Year 1:
+                  <input
+                    type="text"
+                    value={playerCardData.warPercentileRankYr1}
+                    onChange={(e) =>
+                      handleInputChange("warPercentileRankYr1", e.target.value)
+                    }
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+                <label>
+                  Year 2:
+                  <input
+                    type="text"
+                    value={playerCardData.warPercentileRankYr2}
+                    onChange={(e) =>
+                      handleInputChange("warPercentileRankYr2", e.target.value)
+                    }
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+                <label>
+                  Year 3:
+                  <input
+                    type="text"
+                    value={playerCardData.warPercentileRankYr3}
+                    onChange={(e) =>
+                      handleInputChange("warPercentileRankYr3", e.target.value)
+                    }
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className="form-section">
+              <h4>Offense by Year</h4>
+              <div className="form-row">
+                <label>
+                  Year 1:
+                  <input
+                    type="text"
+                    value={playerCardData.offenseYr1}
+                    onChange={(e) =>
+                      handleInputChange("offenseYr1", e.target.value)
+                    }
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+                <label>
+                  Year 2:
+                  <input
+                    type="text"
+                    value={playerCardData.offenseYr2}
+                    onChange={(e) =>
+                      handleInputChange("offenseYr2", e.target.value)
+                    }
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+                <label>
+                  Year 3:
+                  <input
+                    type="text"
+                    value={playerCardData.offenseYr3}
+                    onChange={(e) =>
+                      handleInputChange("offenseYr3", e.target.value)
+                    }
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className="form-section">
+              <h4>Defense by Year</h4>
+              <div className="form-row">
+                <label>
+                  Year 1:
+                  <input
+                    type="text"
+                    value={playerCardData.defenseYr1}
+                    onChange={(e) =>
+                      handleInputChange("defenseYr1", e.target.value)
+                    }
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+                <label>
+                  Year 2:
+                  <input
+                    type="text"
+                    value={playerCardData.defenseYr2}
+                    onChange={(e) =>
+                      handleInputChange("defenseYr2", e.target.value)
+                    }
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+                <label>
+                  Year 3:
+                  <input
+                    type="text"
+                    value={playerCardData.defenseYr3}
+                    onChange={(e) =>
+                      handleInputChange("defenseYr3", e.target.value)
+                    }
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className="form-section">
+              <h4>Finishing by Year</h4>
+              <div className="form-row">
+                <label>
+                  Year 1:
+                  <input
+                    type="text"
+                    value={playerCardData.finishingYr1}
+                    onChange={(e) =>
+                      handleInputChange("finishingYr1", e.target.value)
+                    }
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+                <label>
+                  Year 2:
+                  <input
+                    type="text"
+                    value={playerCardData.finishingYr2}
+                    onChange={(e) =>
+                      handleInputChange("finishingYr2", e.target.value)
+                    }
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+                <label>
+                  Year 3:
+                  <input
+                    type="text"
+                    value={playerCardData.finishingYr3}
+                    onChange={(e) =>
+                      handleInputChange("finishingYr3", e.target.value)
+                    }
+                    placeholder="0-99 or NA"
+                  />
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -757,9 +1321,7 @@ function App() {
                       <input
                         type="text"
                         value={playerCardData.pp}
-                        onChange={(e) =>
-                          handleInputChange("pp", e.target.value)
-                        }
+                        onChange={(e) => handleInputChange("pp", e.target.value)}
                         placeholder="0-99 or NA"
                       />
                     </label>
@@ -768,9 +1330,7 @@ function App() {
                       <input
                         type="text"
                         value={playerCardData.pk}
-                        onChange={(e) =>
-                          handleInputChange("pk", e.target.value)
-                        }
+                        onChange={(e) => handleInputChange("pk", e.target.value)}
                         placeholder="0-99 or NA"
                       />
                     </label>
@@ -862,10 +1422,7 @@ function App() {
                         type="text"
                         value={playerCardData.warPercentileRankYr1}
                         onChange={(e) =>
-                          handleInputChange(
-                            "warPercentileRankYr1",
-                            e.target.value
-                          )
+                          handleInputChange("warPercentileRankYr1", e.target.value)
                         }
                         placeholder="0-99 or NA"
                       />
@@ -876,10 +1433,7 @@ function App() {
                         type="text"
                         value={playerCardData.warPercentileRankYr2}
                         onChange={(e) =>
-                          handleInputChange(
-                            "warPercentileRankYr2",
-                            e.target.value
-                          )
+                          handleInputChange("warPercentileRankYr2", e.target.value)
                         }
                         placeholder="0-99 or NA"
                       />
@@ -890,10 +1444,7 @@ function App() {
                         type="text"
                         value={playerCardData.warPercentileRankYr3}
                         onChange={(e) =>
-                          handleInputChange(
-                            "warPercentileRankYr3",
-                            e.target.value
-                          )
+                          handleInputChange("warPercentileRankYr3", e.target.value)
                         }
                         placeholder="0-99 or NA"
                       />
