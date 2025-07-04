@@ -227,6 +227,35 @@ function App() {
     finishingYr3: "",
   });
 
+  // State to track which fields are set to NA
+  const [naFields, setNaFields] = useState<
+    Record<keyof PlayerCardData, boolean>
+  >({
+    projWAR: false,
+    evOffence: false,
+    evDefence: false,
+    pp: false,
+    pk: false,
+    finishing: false,
+    goals: false,
+    firstAssists: false,
+    penalties: false,
+    competition: false,
+    teammates: false,
+    warPercentileRankYr1: false,
+    warPercentileRankYr2: false,
+    warPercentileRankYr3: false,
+    offenseYr1: false,
+    offenseYr2: false,
+    offenseYr3: false,
+    defenseYr1: false,
+    defenseYr2: false,
+    defenseYr3: false,
+    finishingYr1: false,
+    finishingYr2: false,
+    finishingYr3: false,
+  });
+
   // Fetch all NHL teams on component mount
   useEffect(() => {
     fetchTeams();
@@ -323,6 +352,8 @@ function App() {
 
   const handlePlayerSelect = (player: Player) => {
     setSelectedPlayer(player);
+    // Clear form data when selecting a new player
+    clearAllValues();
     incrementCount(); // Increment count when a player card is created
   };
 
@@ -331,8 +362,8 @@ function App() {
     // Allow empty string
     if (value === "") return true;
 
-    // Allow "NA" (case insensitive)
-    if (value.toUpperCase() === "NA") return true;
+    // Allow "N/A" (case insensitive)
+    if (value.toUpperCase() === "N/A") return true;
 
     // Check if it's a valid number between 0 and 99
     const num = parseFloat(value);
@@ -351,6 +382,199 @@ function App() {
       }));
     }
   };
+
+  // Handle NA checkbox changes
+  const handleNaToggle = (field: keyof PlayerCardData) => {
+    setNaFields((prev) => {
+      const newNaFields = { ...prev, [field]: !prev[field] };
+
+      // If NA is checked, set the field value to "N/A", otherwise clear it
+      if (newNaFields[field]) {
+        setPlayerCardData((prevData) => ({
+          ...prevData,
+          [field]: "N/A",
+        }));
+      } else {
+        setPlayerCardData((prevData) => ({
+          ...prevData,
+          [field]: "",
+        }));
+      }
+
+      return newNaFields;
+    });
+  };
+
+  // Autofill all fields with max value (99)
+  const autofillMaxValues = () => {
+    const maxValues: PlayerCardData = {
+      projWAR: "99",
+      evOffence: "99",
+      evDefence: "99",
+      pp: "99",
+      pk: "99",
+      finishing: "99",
+      goals: "99",
+      firstAssists: "99",
+      penalties: "99",
+      competition: "99",
+      teammates: "99",
+      warPercentileRankYr1: "99",
+      warPercentileRankYr2: "99",
+      warPercentileRankYr3: "99",
+      offenseYr1: "99",
+      offenseYr2: "99",
+      offenseYr3: "99",
+      defenseYr1: "99",
+      defenseYr2: "99",
+      defenseYr3: "99",
+      finishingYr1: "99",
+      finishingYr2: "99",
+      finishingYr3: "99",
+    };
+
+    setPlayerCardData(maxValues);
+    // Clear all NA flags when autofilling
+    setNaFields({
+      projWAR: false,
+      evOffence: false,
+      evDefence: false,
+      pp: false,
+      pk: false,
+      finishing: false,
+      goals: false,
+      firstAssists: false,
+      penalties: false,
+      competition: false,
+      teammates: false,
+      warPercentileRankYr1: false,
+      warPercentileRankYr2: false,
+      warPercentileRankYr3: false,
+      offenseYr1: false,
+      offenseYr2: false,
+      offenseYr3: false,
+      defenseYr1: false,
+      defenseYr2: false,
+      defenseYr3: false,
+      finishingYr1: false,
+      finishingYr2: false,
+      finishingYr3: false,
+    });
+  };
+
+  // Clear all form data
+  const clearAllValues = () => {
+    setPlayerCardData({
+      projWAR: "",
+      evOffence: "",
+      evDefence: "",
+      pp: "",
+      pk: "",
+      finishing: "",
+      goals: "",
+      firstAssists: "",
+      penalties: "",
+      competition: "",
+      teammates: "",
+      warPercentileRankYr1: "",
+      warPercentileRankYr2: "",
+      warPercentileRankYr3: "",
+      offenseYr1: "",
+      offenseYr2: "",
+      offenseYr3: "",
+      defenseYr1: "",
+      defenseYr2: "",
+      defenseYr3: "",
+      finishingYr1: "",
+      finishingYr2: "",
+      finishingYr3: "",
+    });
+
+    setNaFields({
+      projWAR: false,
+      evOffence: false,
+      evDefence: false,
+      pp: false,
+      pk: false,
+      finishing: false,
+      goals: false,
+      firstAssists: false,
+      penalties: false,
+      competition: false,
+      teammates: false,
+      warPercentileRankYr1: false,
+      warPercentileRankYr2: false,
+      warPercentileRankYr3: false,
+      offenseYr1: false,
+      offenseYr2: false,
+      offenseYr3: false,
+      defenseYr1: false,
+      defenseYr2: false,
+      defenseYr3: false,
+      finishingYr1: false,
+      finishingYr2: false,
+      finishingYr3: false,
+    });
+  };
+
+  // Helper component for form fields with NA checkbox (for specific fields only)
+  const FormFieldWithNA = ({
+    label,
+    field,
+    value,
+    isNA,
+  }: {
+    label: string;
+    field: keyof PlayerCardData;
+    value: string;
+    isNA: boolean;
+  }) => (
+    <label className="form-field">
+      {label}:
+      <div className="input-group">
+        <label className="na-checkbox">
+          <input
+            type="checkbox"
+            checked={isNA}
+            onChange={() => handleNaToggle(field)}
+          />
+          N/A
+        </label>
+        {!isNA && (
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => handleInputChange(field, e.target.value)}
+            placeholder="0-99"
+            style={{ color: "#333" }}
+          />
+        )}
+        {isNA && <span className="na-display">N/A</span>}
+      </div>
+    </label>
+  );
+
+  // Helper component for regular form fields (no NA checkbox)
+  const FormField = ({
+    label,
+    field,
+    value,
+  }: {
+    label: string;
+    field: keyof PlayerCardData;
+    value: string;
+  }) => (
+    <label className="form-field">
+      {label}:
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => handleInputChange(field, e.target.value)}
+        placeholder="0-99"
+        style={{ color: "#333" }}
+      />
+    </label>
+  );
 
   const PlayerCard = ({ player }: { player: Player }) => {
     const heightFeet = Math.floor(player.heightInInches / 12);
@@ -382,12 +606,26 @@ function App() {
                 src={player.headshot}
                 alt={`${player.firstName.default} ${player.lastName.default}`}
                 className="player-headshot"
+                onError={(e) => {
+                  console.log('Player headshot failed to load:', player.headshot);
+                  e.currentTarget.style.display = 'none';
+                }}
+                onLoad={() => {
+                  console.log('Player headshot loaded successfully:', player.headshot);
+                }}
               />
               {selectedTeamInfo && (
                 <img
                   src={selectedTeamInfo.teamLogo}
                   alt={selectedTeamInfo.teamName.default}
                   className="team-logo"
+                  onError={(e) => {
+                    console.log('Team logo failed to load:', selectedTeamInfo.teamLogo);
+                    e.currentTarget.style.display = 'none';
+                  }}
+                  onLoad={() => {
+                    console.log('Team logo loaded successfully:', selectedTeamInfo.teamLogo);
+                  }}
                 />
               )}
             </div>
@@ -710,311 +948,198 @@ function App() {
         {selectedPlayer && (
           <div className="form-section-container">
             <div className="player-card-form">
-              <h3>Player Statistics</h3>
+              <div className="form-header">
+                <h3>Player Statistics</h3>
+                <div className="form-actions">
+                  <button
+                    type="button"
+                    onClick={autofillMaxValues}
+                    className="autofill-btn"
+                  >
+                    Autofill Max (99)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={clearAllValues}
+                    className="clear-btn"
+                  >
+                    Clear All
+                  </button>
+                </div>
+              </div>
+
               <div className="form-sections">
                 <div className="form-section">
                   <h4>Advanced Stats</h4>
                   <div className="form-row">
-                    <label>
-                      Proj. WAR:
-                      <input
-                        type="text"
-                        value={playerCardData.projWAR}
-                        onChange={(e) =>
-                          handleInputChange("projWAR", e.target.value)
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
+                    <FormField
+                      label="Proj. WAR"
+                      field="projWAR"
+                      value={playerCardData.projWAR}
+                    />
                   </div>
                   <div className="form-row">
-                    <label>
-                      EV Offence:
-                      <input
-                        type="text"
-                        value={playerCardData.evOffence}
-                        onChange={(e) =>
-                          handleInputChange("evOffence", e.target.value)
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
-                    <label>
-                      EV Defence:
-                      <input
-                        type="text"
-                        value={playerCardData.evDefence}
-                        onChange={(e) =>
-                          handleInputChange("evDefence", e.target.value)
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
+                    <FormField
+                      label="EV Offence"
+                      field="evOffence"
+                      value={playerCardData.evOffence}
+                    />
+                    <FormField
+                      label="EV Defence"
+                      field="evDefence"
+                      value={playerCardData.evDefence}
+                    />
                   </div>
                   <div className="form-row">
-                    <label>
-                      PP:
-                      <input
-                        type="text"
-                        value={playerCardData.pp}
-                        onChange={(e) =>
-                          handleInputChange("pp", e.target.value)
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
-                    <label>
-                      PK:
-                      <input
-                        type="text"
-                        value={playerCardData.pk}
-                        onChange={(e) =>
-                          handleInputChange("pk", e.target.value)
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
+                    <FormFieldWithNA
+                      label="PP"
+                      field="pp"
+                      value={playerCardData.pp}
+                      isNA={naFields.pp}
+                    />
+                    <FormFieldWithNA
+                      label="PK"
+                      field="pk"
+                      value={playerCardData.pk}
+                      isNA={naFields.pk}
+                    />
                   </div>
                 </div>
 
                 <div className="form-section">
                   <h4>Performance</h4>
                   <div className="form-row">
-                    <label>
-                      Finishing:
-                      <input
-                        type="text"
-                        value={playerCardData.finishing}
-                        onChange={(e) =>
-                          handleInputChange("finishing", e.target.value)
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
-                    <label>
-                      Goals:
-                      <input
-                        type="text"
-                        value={playerCardData.goals}
-                        onChange={(e) =>
-                          handleInputChange("goals", e.target.value)
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
+                    <FormFieldWithNA
+                      label="Finishing"
+                      field="finishing"
+                      value={playerCardData.finishing}
+                      isNA={naFields.finishing}
+                    />
+                    <FormField
+                      label="Goals"
+                      field="goals"
+                      value={playerCardData.goals}
+                    />
                   </div>
                   <div className="form-row">
-                    <label>
-                      1st Assists:
-                      <input
-                        type="text"
-                        value={playerCardData.firstAssists}
-                        onChange={(e) =>
-                          handleInputChange("firstAssists", e.target.value)
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
-                    <label>
-                      Penalties:
-                      <input
-                        type="text"
-                        value={playerCardData.penalties}
-                        onChange={(e) =>
-                          handleInputChange("penalties", e.target.value)
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
+                    <FormField
+                      label="1st Assists"
+                      field="firstAssists"
+                      value={playerCardData.firstAssists}
+                    />
+                    <FormField
+                      label="Penalties"
+                      field="penalties"
+                      value={playerCardData.penalties}
+                    />
                   </div>
                   <div className="form-row">
-                    <label>
-                      Competition:
-                      <input
-                        type="text"
-                        value={playerCardData.competition}
-                        onChange={(e) =>
-                          handleInputChange("competition", e.target.value)
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
-                    <label>
-                      Teammates:
-                      <input
-                        type="text"
-                        value={playerCardData.teammates}
-                        onChange={(e) =>
-                          handleInputChange("teammates", e.target.value)
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
+                    <FormField
+                      label="Competition"
+                      field="competition"
+                      value={playerCardData.competition}
+                    />
+                    <FormField
+                      label="Teammates"
+                      field="teammates"
+                      value={playerCardData.teammates}
+                    />
                   </div>
                 </div>
 
                 <div className="form-section">
                   <h4>WAR Percentile Rank</h4>
                   <div className="form-row">
-                    <label>
-                      Year 1:
-                      <input
-                        type="text"
-                        value={playerCardData.warPercentileRankYr1}
-                        onChange={(e) =>
-                          handleInputChange(
-                            "warPercentileRankYr1",
-                            e.target.value
-                          )
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
-                    <label>
-                      Year 2:
-                      <input
-                        type="text"
-                        value={playerCardData.warPercentileRankYr2}
-                        onChange={(e) =>
-                          handleInputChange(
-                            "warPercentileRankYr2",
-                            e.target.value
-                          )
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
-                    <label>
-                      Year 3:
-                      <input
-                        type="text"
-                        value={playerCardData.warPercentileRankYr3}
-                        onChange={(e) =>
-                          handleInputChange(
-                            "warPercentileRankYr3",
-                            e.target.value
-                          )
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
+                    <FormFieldWithNA
+                      label="Year 1"
+                      field="warPercentileRankYr1"
+                      value={playerCardData.warPercentileRankYr1}
+                      isNA={naFields.warPercentileRankYr1}
+                    />
+                    <FormFieldWithNA
+                      label="Year 2"
+                      field="warPercentileRankYr2"
+                      value={playerCardData.warPercentileRankYr2}
+                      isNA={naFields.warPercentileRankYr2}
+                    />
+                    <FormFieldWithNA
+                      label="Year 3"
+                      field="warPercentileRankYr3"
+                      value={playerCardData.warPercentileRankYr3}
+                      isNA={naFields.warPercentileRankYr3}
+                    />
                   </div>
                 </div>
 
                 <div className="form-section">
                   <h4>Offense by Year</h4>
                   <div className="form-row">
-                    <label>
-                      Year 1:
-                      <input
-                        type="text"
-                        value={playerCardData.offenseYr1}
-                        onChange={(e) =>
-                          handleInputChange("offenseYr1", e.target.value)
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
-                    <label>
-                      Year 2:
-                      <input
-                        type="text"
-                        value={playerCardData.offenseYr2}
-                        onChange={(e) =>
-                          handleInputChange("offenseYr2", e.target.value)
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
-                    <label>
-                      Year 3:
-                      <input
-                        type="text"
-                        value={playerCardData.offenseYr3}
-                        onChange={(e) =>
-                          handleInputChange("offenseYr3", e.target.value)
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
+                    <FormFieldWithNA
+                      label="Year 1"
+                      field="offenseYr1"
+                      value={playerCardData.offenseYr1}
+                      isNA={naFields.offenseYr1}
+                    />
+                    <FormFieldWithNA
+                      label="Year 2"
+                      field="offenseYr2"
+                      value={playerCardData.offenseYr2}
+                      isNA={naFields.offenseYr2}
+                    />
+                    <FormFieldWithNA
+                      label="Year 3"
+                      field="offenseYr3"
+                      value={playerCardData.offenseYr3}
+                      isNA={naFields.offenseYr3}
+                    />
                   </div>
                 </div>
 
                 <div className="form-section">
                   <h4>Defense by Year</h4>
                   <div className="form-row">
-                    <label>
-                      Year 1:
-                      <input
-                        type="text"
-                        value={playerCardData.defenseYr1}
-                        onChange={(e) =>
-                          handleInputChange("defenseYr1", e.target.value)
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
-                    <label>
-                      Year 2:
-                      <input
-                        type="text"
-                        value={playerCardData.defenseYr2}
-                        onChange={(e) =>
-                          handleInputChange("defenseYr2", e.target.value)
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
-                    <label>
-                      Year 3:
-                      <input
-                        type="text"
-                        value={playerCardData.defenseYr3}
-                        onChange={(e) =>
-                          handleInputChange("defenseYr3", e.target.value)
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
+                    <FormFieldWithNA
+                      label="Year 1"
+                      field="defenseYr1"
+                      value={playerCardData.defenseYr1}
+                      isNA={naFields.defenseYr1}
+                    />
+                    <FormFieldWithNA
+                      label="Year 2"
+                      field="defenseYr2"
+                      value={playerCardData.defenseYr2}
+                      isNA={naFields.defenseYr2}
+                    />
+                    <FormFieldWithNA
+                      label="Year 3"
+                      field="defenseYr3"
+                      value={playerCardData.defenseYr3}
+                      isNA={naFields.defenseYr3}
+                    />
                   </div>
                 </div>
 
                 <div className="form-section">
                   <h4>Finishing by Year</h4>
                   <div className="form-row">
-                    <label>
-                      Year 1:
-                      <input
-                        type="text"
-                        value={playerCardData.finishingYr1}
-                        onChange={(e) =>
-                          handleInputChange("finishingYr1", e.target.value)
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
-                    <label>
-                      Year 2:
-                      <input
-                        type="text"
-                        value={playerCardData.finishingYr2}
-                        onChange={(e) =>
-                          handleInputChange("finishingYr2", e.target.value)
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
-                    <label>
-                      Year 3:
-                      <input
-                        type="text"
-                        value={playerCardData.finishingYr3}
-                        onChange={(e) =>
-                          handleInputChange("finishingYr3", e.target.value)
-                        }
-                        placeholder="0-99 or NA"
-                      />
-                    </label>
+                    <FormFieldWithNA
+                      label="Year 1"
+                      field="finishingYr1"
+                      value={playerCardData.finishingYr1}
+                      isNA={naFields.finishingYr1}
+                    />
+                    <FormFieldWithNA
+                      label="Year 2"
+                      field="finishingYr2"
+                      value={playerCardData.finishingYr2}
+                      isNA={naFields.finishingYr2}
+                    />
+                    <FormFieldWithNA
+                      label="Year 3"
+                      field="finishingYr3"
+                      value={playerCardData.finishingYr3}
+                      isNA={naFields.finishingYr3}
+                    />
                   </div>
                 </div>
               </div>
