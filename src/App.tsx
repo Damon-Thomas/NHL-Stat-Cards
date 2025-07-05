@@ -339,19 +339,12 @@ function App() {
         )}
 
         <div className="card-section">
-          {selectedPlayer ? (
-            <PlayerCard
-              player={selectedPlayer}
-              selectedTeam={selectedTeam}
-              teams={teams}
-              playerCardData={playerCardData}
-            />
-          ) : (
-            <div className="no-player-selected">
-              <h2>Select a Player</h2>
-              <p>Choose a team and click on a player to view their card</p>
-            </div>
-          )}
+          <PlayerCard
+            player={selectedPlayer}
+            selectedTeam={selectedTeam}
+            teams={teams}
+            playerCardData={playerCardData}
+          />
         </div>
       </div>
     </div>

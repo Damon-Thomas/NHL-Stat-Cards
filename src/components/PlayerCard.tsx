@@ -1,10 +1,10 @@
 import type { Player, Team, PlayerCardData } from "../types.js";
 
 interface PlayerCardProps {
-  player: Player;
-  selectedTeam: string;
-  teams: Team[];
-  playerCardData: PlayerCardData;
+  player?: Player;
+  selectedTeam?: string;
+  teams?: Team[];
+  playerCardData?: PlayerCardData;
 }
 
 // NHL Team Colors
@@ -65,299 +65,327 @@ const PlayerCard = ({
   teams,
   playerCardData,
 }: PlayerCardProps) => {
+  if (!player) {
+    return null;
+  }
+
   const heightFeet = Math.floor(player.heightInInches / 12);
   const heightInches = player.heightInInches % 12;
   const age =
     new Date().getFullYear() - new Date(player.birthDate).getFullYear();
 
   // Get team colors
-  const teamColorScheme = getTeamColors(selectedTeam);
+  const teamColorScheme = getTeamColors(selectedTeam ?? "");
 
   // Get team info
-  const selectedTeamInfo = teams.find(
+  const selectedTeamInfo = teams?.find(
     (t) => t.teamAbbrev.default === selectedTeam
   );
 
   return (
-    <div
-      className="player-card"
-      style={{
-        background: `linear-gradient(135deg, ${teamColorScheme.primary} 0%, ${teamColorScheme.secondary} 100%)`,
-        boxShadow: `0 8px 32px ${teamColorScheme.primary}33`,
-        borderTop: `4px solid ${teamColorScheme.primary}`,
-      }}
-    >
-      <div className="player-card-header">
-        <div className="player-card-title">
-          <div className="player-card-images">
-            <img
-              src={player.headshot}
-              alt={`${player.firstName.default} ${player.lastName.default}`}
-              className="player-headshot"
-              onError={(e) => {
-                console.log("Player headshot failed to load:", player.headshot);
-                e.currentTarget.style.display = "none";
-              }}
-              onLoad={() => {
-                console.log(
-                  "Player headshot loaded successfully:",
-                  player.headshot
-                );
-              }}
-            />
-            {selectedTeamInfo && (
+    <>
+      <div className="w-full min-h-48 bg-white shadow-lg rounded-lg p-4 mb-4 border-2 border-blue-500">
+        <p className="text-2xl font-bold text-red-500">
+          Testing Tailwind - This should be red and large if working!
+        </p>
+      </div>
+      <div
+        className="player-card"
+        style={{
+          background: `linear-gradient(135deg, ${teamColorScheme.primary} 0%, ${teamColorScheme.secondary} 100%)`,
+          boxShadow: `0 8px 32px ${teamColorScheme.primary}33`,
+          borderTop: `4px solid ${teamColorScheme.primary}`,
+        }}
+      >
+        <div className="player-card-header">
+          <div className="player-card-title">
+            <div className="player-card-images">
               <img
-                src={selectedTeamInfo.teamLogo}
-                alt={selectedTeamInfo.teamName.default}
-                className="team-logo"
+                src={player.headshot}
+                alt={`${player.firstName.default} ${player.lastName.default}`}
+                className="player-headshot"
                 onError={(e) => {
                   console.log(
-                    "Team logo failed to load:",
-                    selectedTeamInfo.teamLogo
+                    "Player headshot failed to load:",
+                    player.headshot
                   );
                   e.currentTarget.style.display = "none";
                 }}
                 onLoad={() => {
                   console.log(
-                    "Team logo loaded successfully:",
-                    selectedTeamInfo.teamLogo
+                    "Player headshot loaded successfully:",
+                    player.headshot
                   );
                 }}
               />
+              {selectedTeamInfo && (
+                <img
+                  src={selectedTeamInfo.teamLogo}
+                  alt={selectedTeamInfo.teamName.default}
+                  className="team-logo"
+                  onError={(e) => {
+                    console.log(
+                      "Team logo failed to load:",
+                      selectedTeamInfo.teamLogo
+                    );
+                    e.currentTarget.style.display = "none";
+                  }}
+                  onLoad={() => {
+                    console.log(
+                      "Team logo loaded successfully:",
+                      selectedTeamInfo.teamLogo
+                    );
+                  }}
+                />
+              )}
+            </div>
+            <h2 className="player-card-name">
+              {player.firstName.default} {player.lastName.default}
+            </h2>
+            {selectedTeamInfo && (
+              <div className="player-card-team">
+                {selectedTeamInfo.teamName.default}
+              </div>
             )}
           </div>
-          <h2 className="player-card-name">
-            {player.firstName.default} {player.lastName.default}
-          </h2>
-          {selectedTeamInfo && (
-            <div className="player-card-team">
-              {selectedTeamInfo.teamName.default}
+          <div className="player-card-number">#{player.sweaterNumber}</div>
+        </div>
+
+        <div className="player-card-stats">
+          <div className="stat-group">
+            <h3>Basic Info</h3>
+            <div className="stat-item">
+              <span className="stat-label">Position:</span>
+              <span className="stat-value">{player.positionCode}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Shoots/Catches:</span>
+              <span className="stat-value">{player.shootsCatches}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Age:</span>
+              <span className="stat-value">{age}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Height:</span>
+              <span className="stat-value">
+                {heightFeet}'{heightInches}"
+              </span>
+            </div>
+          </div>
+
+          {/* Advanced Stats */}
+          <div className="stat-group">
+            <h3>Advanced Stats</h3>
+            {playerCardData?.projWAR && (
+              <div className="stat-item">
+                <span className="stat-label">Proj. WAR:</span>
+                <span className="stat-value">{playerCardData.projWAR}</span>
+              </div>
+            )}
+            {playerCardData?.evOffence && (
+              <div className="stat-item">
+                <span className="stat-label">EV Offence:</span>
+                <span className="stat-value">{playerCardData.evOffence}</span>
+              </div>
+            )}
+            {playerCardData?.evDefence && (
+              <div className="stat-item">
+                <span className="stat-label">EV Defence:</span>
+                <span className="stat-value">{playerCardData.evDefence}</span>
+              </div>
+            )}
+            {playerCardData?.pp && (
+              <div className="stat-item">
+                <span className="stat-label">PP:</span>
+                <span className="stat-value">{playerCardData.pp}</span>
+              </div>
+            )}
+            {playerCardData?.pk && (
+              <div className="stat-item">
+                <span className="stat-label">PK:</span>
+                <span className="stat-value">{playerCardData.pk}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Performance Stats */}
+          <div className="stat-group">
+            <h3>Performance</h3>
+            {playerCardData?.finishing && (
+              <div className="stat-item">
+                <span className="stat-label">Finishing:</span>
+                <span className="stat-value">{playerCardData.finishing}</span>
+              </div>
+            )}
+            {playerCardData?.goals && (
+              <div className="stat-item">
+                <span className="stat-label">Goals:</span>
+                <span className="stat-value">{playerCardData.goals}</span>
+              </div>
+            )}
+            {playerCardData?.firstAssists && (
+              <div className="stat-item">
+                <span className="stat-label">1st Assists:</span>
+                <span className="stat-value">
+                  {playerCardData.firstAssists}
+                </span>
+              </div>
+            )}
+            {playerCardData?.penalties && (
+              <div className="stat-item">
+                <span className="stat-label">Penalties:</span>
+                <span className="stat-value">{playerCardData.penalties}</span>
+              </div>
+            )}
+            {playerCardData?.competition && (
+              <div className="stat-item">
+                <span className="stat-label">Competition:</span>
+                <span className="stat-value">{playerCardData.competition}</span>
+              </div>
+            )}
+            {playerCardData?.teammates && (
+              <div className="stat-item">
+                <span className="stat-label">Teammates:</span>
+                <span className="stat-value">{playerCardData.teammates}</span>
+              </div>
+            )}
+          </div>
+
+          {/* WAR Percentile Rankings */}
+          {(playerCardData?.warPercentileRankYr1 ||
+            playerCardData?.warPercentileRankYr2 ||
+            playerCardData?.warPercentileRankYr3) && (
+            <div className="stat-group">
+              <h3>WAR Percentile Rank</h3>
+              {playerCardData.warPercentileRankYr1 && (
+                <div className="stat-item">
+                  <span className="stat-label">Year 1:</span>
+                  <span className="stat-value">
+                    {playerCardData.warPercentileRankYr1}
+                  </span>
+                </div>
+              )}
+              {playerCardData.warPercentileRankYr2 && (
+                <div className="stat-item">
+                  <span className="stat-label">Year 2:</span>
+                  <span className="stat-value">
+                    {playerCardData.warPercentileRankYr2}
+                  </span>
+                </div>
+              )}
+              {playerCardData.warPercentileRankYr3 && (
+                <div className="stat-item">
+                  <span className="stat-label">Year 3:</span>
+                  <span className="stat-value">
+                    {playerCardData.warPercentileRankYr3}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Offense by Year */}
+          {(playerCardData?.offenseYr1 ||
+            playerCardData?.offenseYr2 ||
+            playerCardData?.offenseYr3) && (
+            <div className="stat-group">
+              <h3>Offense by Year</h3>
+              {playerCardData.offenseYr1 && (
+                <div className="stat-item">
+                  <span className="stat-label">Year 1:</span>
+                  <span className="stat-value">
+                    {playerCardData.offenseYr1}
+                  </span>
+                </div>
+              )}
+              {playerCardData.offenseYr2 && (
+                <div className="stat-item">
+                  <span className="stat-label">Year 2:</span>
+                  <span className="stat-value">
+                    {playerCardData.offenseYr2}
+                  </span>
+                </div>
+              )}
+              {playerCardData.offenseYr3 && (
+                <div className="stat-item">
+                  <span className="stat-label">Year 3:</span>
+                  <span className="stat-value">
+                    {playerCardData.offenseYr3}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Defense by Year */}
+          {(playerCardData?.defenseYr1 ||
+            playerCardData?.defenseYr2 ||
+            playerCardData?.defenseYr3) && (
+            <div className="stat-group">
+              <h3>Defense by Year</h3>
+              {playerCardData.defenseYr1 && (
+                <div className="stat-item">
+                  <span className="stat-label">Year 1:</span>
+                  <span className="stat-value">
+                    {playerCardData.defenseYr1}
+                  </span>
+                </div>
+              )}
+              {playerCardData.defenseYr2 && (
+                <div className="stat-item">
+                  <span className="stat-label">Year 2:</span>
+                  <span className="stat-value">
+                    {playerCardData.defenseYr2}
+                  </span>
+                </div>
+              )}
+              {playerCardData.defenseYr3 && (
+                <div className="stat-item">
+                  <span className="stat-label">Year 3:</span>
+                  <span className="stat-value">
+                    {playerCardData.defenseYr3}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Finishing by Year */}
+          {(playerCardData?.finishingYr1 ||
+            playerCardData?.finishingYr2 ||
+            playerCardData?.finishingYr3) && (
+            <div className="stat-group">
+              <h3>Finishing by Year</h3>
+              {playerCardData.finishingYr1 && (
+                <div className="stat-item">
+                  <span className="stat-label">Year 1:</span>
+                  <span className="stat-value">
+                    {playerCardData.finishingYr1}
+                  </span>
+                </div>
+              )}
+              {playerCardData.finishingYr2 && (
+                <div className="stat-item">
+                  <span className="stat-label">Year 2:</span>
+                  <span className="stat-value">
+                    {playerCardData.finishingYr2}
+                  </span>
+                </div>
+              )}
+              {playerCardData.finishingYr3 && (
+                <div className="stat-item">
+                  <span className="stat-label">Year 3:</span>
+                  <span className="stat-value">
+                    {playerCardData.finishingYr3}
+                  </span>
+                </div>
+              )}
             </div>
           )}
         </div>
-        <div className="player-card-number">#{player.sweaterNumber}</div>
       </div>
-
-      <div className="player-card-stats">
-        <div className="stat-group">
-          <h3>Basic Info</h3>
-          <div className="stat-item">
-            <span className="stat-label">Position:</span>
-            <span className="stat-value">{player.positionCode}</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-label">Shoots/Catches:</span>
-            <span className="stat-value">{player.shootsCatches}</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-label">Age:</span>
-            <span className="stat-value">{age}</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-label">Height:</span>
-            <span className="stat-value">
-              {heightFeet}'{heightInches}"
-            </span>
-          </div>
-        </div>
-
-        {/* Advanced Stats */}
-        <div className="stat-group">
-          <h3>Advanced Stats</h3>
-          {playerCardData.projWAR && (
-            <div className="stat-item">
-              <span className="stat-label">Proj. WAR:</span>
-              <span className="stat-value">{playerCardData.projWAR}</span>
-            </div>
-          )}
-          {playerCardData.evOffence && (
-            <div className="stat-item">
-              <span className="stat-label">EV Offence:</span>
-              <span className="stat-value">{playerCardData.evOffence}</span>
-            </div>
-          )}
-          {playerCardData.evDefence && (
-            <div className="stat-item">
-              <span className="stat-label">EV Defence:</span>
-              <span className="stat-value">{playerCardData.evDefence}</span>
-            </div>
-          )}
-          {playerCardData.pp && (
-            <div className="stat-item">
-              <span className="stat-label">PP:</span>
-              <span className="stat-value">{playerCardData.pp}</span>
-            </div>
-          )}
-          {playerCardData.pk && (
-            <div className="stat-item">
-              <span className="stat-label">PK:</span>
-              <span className="stat-value">{playerCardData.pk}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Performance Stats */}
-        <div className="stat-group">
-          <h3>Performance</h3>
-          {playerCardData.finishing && (
-            <div className="stat-item">
-              <span className="stat-label">Finishing:</span>
-              <span className="stat-value">{playerCardData.finishing}</span>
-            </div>
-          )}
-          {playerCardData.goals && (
-            <div className="stat-item">
-              <span className="stat-label">Goals:</span>
-              <span className="stat-value">{playerCardData.goals}</span>
-            </div>
-          )}
-          {playerCardData.firstAssists && (
-            <div className="stat-item">
-              <span className="stat-label">1st Assists:</span>
-              <span className="stat-value">{playerCardData.firstAssists}</span>
-            </div>
-          )}
-          {playerCardData.penalties && (
-            <div className="stat-item">
-              <span className="stat-label">Penalties:</span>
-              <span className="stat-value">{playerCardData.penalties}</span>
-            </div>
-          )}
-          {playerCardData.competition && (
-            <div className="stat-item">
-              <span className="stat-label">Competition:</span>
-              <span className="stat-value">{playerCardData.competition}</span>
-            </div>
-          )}
-          {playerCardData.teammates && (
-            <div className="stat-item">
-              <span className="stat-label">Teammates:</span>
-              <span className="stat-value">{playerCardData.teammates}</span>
-            </div>
-          )}
-        </div>
-
-        {/* WAR Percentile Rankings */}
-        {(playerCardData.warPercentileRankYr1 ||
-          playerCardData.warPercentileRankYr2 ||
-          playerCardData.warPercentileRankYr3) && (
-          <div className="stat-group">
-            <h3>WAR Percentile Rank</h3>
-            {playerCardData.warPercentileRankYr1 && (
-              <div className="stat-item">
-                <span className="stat-label">Year 1:</span>
-                <span className="stat-value">
-                  {playerCardData.warPercentileRankYr1}
-                </span>
-              </div>
-            )}
-            {playerCardData.warPercentileRankYr2 && (
-              <div className="stat-item">
-                <span className="stat-label">Year 2:</span>
-                <span className="stat-value">
-                  {playerCardData.warPercentileRankYr2}
-                </span>
-              </div>
-            )}
-            {playerCardData.warPercentileRankYr3 && (
-              <div className="stat-item">
-                <span className="stat-label">Year 3:</span>
-                <span className="stat-value">
-                  {playerCardData.warPercentileRankYr3}
-                </span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Offense by Year */}
-        {(playerCardData.offenseYr1 ||
-          playerCardData.offenseYr2 ||
-          playerCardData.offenseYr3) && (
-          <div className="stat-group">
-            <h3>Offense by Year</h3>
-            {playerCardData.offenseYr1 && (
-              <div className="stat-item">
-                <span className="stat-label">Year 1:</span>
-                <span className="stat-value">{playerCardData.offenseYr1}</span>
-              </div>
-            )}
-            {playerCardData.offenseYr2 && (
-              <div className="stat-item">
-                <span className="stat-label">Year 2:</span>
-                <span className="stat-value">{playerCardData.offenseYr2}</span>
-              </div>
-            )}
-            {playerCardData.offenseYr3 && (
-              <div className="stat-item">
-                <span className="stat-label">Year 3:</span>
-                <span className="stat-value">{playerCardData.offenseYr3}</span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Defense by Year */}
-        {(playerCardData.defenseYr1 ||
-          playerCardData.defenseYr2 ||
-          playerCardData.defenseYr3) && (
-          <div className="stat-group">
-            <h3>Defense by Year</h3>
-            {playerCardData.defenseYr1 && (
-              <div className="stat-item">
-                <span className="stat-label">Year 1:</span>
-                <span className="stat-value">{playerCardData.defenseYr1}</span>
-              </div>
-            )}
-            {playerCardData.defenseYr2 && (
-              <div className="stat-item">
-                <span className="stat-label">Year 2:</span>
-                <span className="stat-value">{playerCardData.defenseYr2}</span>
-              </div>
-            )}
-            {playerCardData.defenseYr3 && (
-              <div className="stat-item">
-                <span className="stat-label">Year 3:</span>
-                <span className="stat-value">{playerCardData.defenseYr3}</span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Finishing by Year */}
-        {(playerCardData.finishingYr1 ||
-          playerCardData.finishingYr2 ||
-          playerCardData.finishingYr3) && (
-          <div className="stat-group">
-            <h3>Finishing by Year</h3>
-            {playerCardData.finishingYr1 && (
-              <div className="stat-item">
-                <span className="stat-label">Year 1:</span>
-                <span className="stat-value">
-                  {playerCardData.finishingYr1}
-                </span>
-              </div>
-            )}
-            {playerCardData.finishingYr2 && (
-              <div className="stat-item">
-                <span className="stat-label">Year 2:</span>
-                <span className="stat-value">
-                  {playerCardData.finishingYr2}
-                </span>
-              </div>
-            )}
-            {playerCardData.finishingYr3 && (
-              <div className="stat-item">
-                <span className="stat-label">Year 3:</span>
-                <span className="stat-value">
-                  {playerCardData.finishingYr3}
-                </span>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
+    </>
   );
 };
 
