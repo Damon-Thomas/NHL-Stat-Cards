@@ -1,7 +1,7 @@
 import type { Player, Team, PlayerCardData } from "../types.js";
 
 interface PlayerCardProps {
-  player?: Player;
+  player?: Player | null;
   selectedTeam?: string;
   teams?: Team[];
   playerCardData?: PlayerCardData;
@@ -66,7 +66,35 @@ const PlayerCard = ({
   playerCardData,
 }: PlayerCardProps) => {
   if (!player) {
-    return null;
+    return (
+      <div className="min-w-56 min-h-48 bg-white shadow-lg rounded-lg p-4 mb-4 grid grid-cols-[3fr_2fr] gap-4">
+        <div className="bg-amber-300 p-4">
+          <div className="h-10 bg-gray-400 w-full mb-2 rounded"></div>
+          <div className="h-6 bg-gray-300 w-3/4 mb-2 rounded"></div>
+          <div className="h-4 bg-gray-300 w-1/2 rounded"></div>
+        </div>
+        <div className="bg-purple-400 p-4 flex items-center justify-center">
+          <img
+            src="/nhl-seeklogo.png"
+            alt="NHL Logo"
+            className="w-16 h-16 object-contain"
+            onError={(e) => {
+              console.log("NHL logo failed to load");
+              // Try alternative URL
+              e.currentTarget.src =
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/NHL_Shield.svg/1200px-NHL_Shield.svg.png";
+              e.currentTarget.onerror = () => {
+                // Final fallback to text
+                e.currentTarget.style.display = "none";
+                e.currentTarget.parentElement!.innerHTML = `
+                  <div class="text-white text-xl font-bold">NHL</div>
+                `;
+              };
+            }}
+          />
+        </div>
+      </div>
+    );
   }
 
   const heightFeet = Math.floor(player.heightInInches / 12);
@@ -84,10 +112,9 @@ const PlayerCard = ({
 
   return (
     <>
-      <div className="w-full min-h-48 bg-white shadow-lg rounded-lg p-4 mb-4 border-2 border-blue-500">
-        <p className="text-2xl font-bold text-red-500">
-          Testing Tailwind - This should be red and large if working!
-        </p>
+      <div className="w-full min-h-48 bg-white shadow-lg rounded-lg p-4 mb-4 flex">
+        <div className="flex-[3] bg-amber-300"></div>
+        <div className="flex-[2] bg-purple-400"></div>
       </div>
       <div
         className="player-card"
