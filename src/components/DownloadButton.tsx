@@ -27,17 +27,24 @@ export default function DownloadButton({
 
     setIsGenerating(true);
     try {
-      console.log("Starting PNG generation with proxied images...");
+      console.log("Starting ultra-high-quality PNG generation...");
 
-      // Since images are now proxied as base64 data URLs, modern-screenshot should work without CORS issues
+      // Get the original dimensions
+      const rect = elementRef.current.getBoundingClientRect();
+      console.log("Original dimensions:", rect.width, "x", rect.height);
+
+      // Generate at very high resolution for crisp quality
       const dataUrl = await domToPng(elementRef.current, {
-        quality: 1,
+        quality: 1.0,
         backgroundColor: "#ffffff",
+        scale: 6, // Very high scale for maximum quality
         style: {
           transform: "scale(1)",
           transformOrigin: "top left",
         },
       });
+
+      console.log("PNG generation completed, downloading...");
 
       // Create download link
       const playerName = selectedPlayer
