@@ -2,7 +2,7 @@ import type { Player, Team } from "../types";
 
 interface PlayerSelectorProps {
   teams: Team[];
-  selectedTeam: string;
+  selectedTeam: Team | null | undefined;
   roster: Player[];
   selectedPlayer: Player | null;
   loading: boolean;
@@ -23,15 +23,12 @@ const PlayerSelector = ({
 }: PlayerSelectorProps) => {
   return (
     <div className="top-section">
-      <h1>NHL Stat Cards</h1>
-
       {error && <div className="error">Error: {error}</div>}
-
       <div className="team-selector">
         <label htmlFor="team-select">Select a Team:</label>
         <select
           id="team-select"
-          value={selectedTeam}
+          value={selectedTeam?.teamName ? selectedTeam.teamName.default : ""}
           onChange={(e) => onTeamSelect(e.target.value)}
           disabled={loading}
         >
@@ -51,13 +48,7 @@ const PlayerSelector = ({
 
       {roster.length > 0 && (
         <div className="roster">
-          <h2>
-            Roster for{" "}
-            {
-              teams.find((t) => t.teamAbbrev.default === selectedTeam)?.teamName
-                .default
-            }
-          </h2>
+          <h2>Roster for {selectedTeam?.teamName.default}</h2>
           <div className="players-list">
             {roster.map((player) => (
               <div
