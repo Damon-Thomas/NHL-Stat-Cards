@@ -39,7 +39,7 @@ export const teamColors: Record<
 
 // Default team colors for fallback
 export const DEFAULT_TEAM_COLORS = {
-  primary: "#667eea",
+  primary: "#000000",
   secondary: "#764ba2",
   accent: "#ffffff",
 };

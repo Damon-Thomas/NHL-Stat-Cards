@@ -382,9 +382,6 @@ function App() {
     if (selectedPlayer && selectedTeam) {
       heightFeet = Math.floor(selectedPlayer.heightInInches / 12);
       heightInches = selectedPlayer.heightInInches % 12;
-      age =
-        new Date().getFullYear() -
-        new Date(selectedPlayer.birthDate).getFullYear();
 
       // Get team colors
       teamColorScheme = getTeamColors(selectedTeam?.teamAbbrev.default ?? "");
@@ -392,6 +389,50 @@ function App() {
       // Get team info
       selectedTeamInfo = selectedTeam;
     }
+
+    function formatAge(age: string | undefined): number {
+      if (!age) return 0; // Handle undefined or null age
+      return new Date().getFullYear() - new Date(age).getFullYear();
+    }
+
+    function inchesToFeet(inches: number | undefined): string {
+      if (inches === undefined || inches < 0) return `5'10"`; // Handle undefined or negative values
+      const feet = Math.floor(inches / 12);
+      const remainingInches = inches % 12;
+      return `${feet}'${remainingInches}"`;
+    }
+
+    function formatHandedness(handedness: string | undefined): string {
+      if (!handedness) return "Left"; // Default to left if undefined
+      if (handedness === "L") {
+        return "Left";
+      }
+      if (handedness === "R") {
+        return "Right";
+      }
+      return "Unknown"; // Handle other cases
+    }
+
+    function formatPosition(position: string | undefined): string {
+      if (!position) return "LW"; // Handle undefined or null position
+      if (position === "L") {
+        return "LW";
+      }
+      if (position === "C") {
+        return "C";
+      }
+      if (position === "R") {
+        return "RW";
+      }
+      if (position === "D") {
+        return "D";
+      }
+      if (position === "G") {
+        return "G";
+      }
+      return position; // Handle other cases
+    }
+
     return (
       <div
         ref={playerCardRef}
@@ -503,8 +544,39 @@ function App() {
               </div>
             </div>
           </div>
-          <div className="h-6 bg-gray-300 w-3/4 mb-2 rounded"></div>
-          <div className="h-4 bg-gray-300 w-1/2 rounded"></div>
+          <div className="h-auto w-full mb-2 grid grid-cols-[1fr_1fr_1fr] gap-2">
+            <img
+              src={selectedPlayer?.headshot || "/default-skater.png"}
+              alt={selectedTeam ? selectedTeam.teamName.default : "NHL Logo"}
+              className=" h-auto object-contain"
+            />
+            <div className="h-4 bg-gray-300 rounded"></div>
+
+            <div className="grid grid-rows-4">
+              <div className="flex items-center">
+                <p className="flex-2">POS:</p>
+                <p className="flex-1">
+                  {formatPosition(selectedPlayer?.positionCode)}
+                </p>
+              </div>
+              <div className="flex items-center">
+                <p className="flex-2">AGE:</p>
+                <p className="flex-1">{formatAge(selectedPlayer?.birthDate)}</p>
+              </div>
+              <div className="flex items-center">
+                <p className="flex-2">HND:</p>
+                <p className="flex-1">
+                  {formatHandedness(selectedPlayer?.shootsCatches)}
+                </p>
+              </div>
+              <div className="flex items-center">
+                <p className="flex-2">HGT:</p>
+                <p className="flex-1">
+                  {inchesToFeet(selectedPlayer?.heightInInches)}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
         <div className="bg-purple-400 p-4 flex items-center justify-center min-w-0 overflow-hidden"></div>
       </div>
@@ -512,7 +584,7 @@ function App() {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col items-center justify-start overflow-auto pt-24 px-2 sm:px-4">
+    <div className="h-screen w-screen flex flex-col items-center justify-start overflow-auto pt-24 px-1 sm:px-4">
       <div className="fixed top-0 left-0 h-20 w-screen p-2 bg-white text-black shadow-lg z-10 flex justify-around items-center">
         <CardCount count={cardCount} />
         <DownloadButton
