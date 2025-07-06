@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import type { Team, Player, PlayerCardData } from "./types";
 import CardCount from "./components/CardCount";
 import DownloadButton from "./components/DownloadButton";
+import TeamDropdownItem from "./components/TeamDropdownItem";
+import { getTeamLogoPath } from "./utils/teamLogos";
 import "./App.css";
 import { DEFAULT_TEAM_COLORS, getTeamColors } from "./data/colors";
 
@@ -72,6 +74,9 @@ function App() {
     finishingYr2: false,
     finishingYr3: false,
   });
+
+  // Get the local logo path for the selected team
+  const selectedTeamLogoUrl = getTeamLogoPath(selectedTeam?.teamAbbrev.default);
 
   // Fetch all NHL teams on component mount
   useEffect(() => {
@@ -404,7 +409,7 @@ function App() {
                 disabled={loading}
               >
                 <img
-                  src={selectedTeam?.teamLogo || "/nhl-seeklogo.png"}
+                  src={selectedTeamLogoUrl}
                   alt={
                     selectedTeam ? selectedTeam.teamName.default : "NHL Logo"
                   }
@@ -413,20 +418,6 @@ function App() {
                       ? "w-full h-full object-contain"
                       : "w-8 h-8 object-contain"
                   }
-                  onError={(e) => {
-                    console.log("Team logo failed to load");
-                    // Try alternative URL for fallback
-                    e.currentTarget.src =
-                      "https://assets.nhle.com/logos/nhl/svg/nhl-logo.svg";
-                    e.currentTarget.className = "w-8 h-8 object-contain";
-                    e.currentTarget.onerror = () => {
-                      // Final fallback to text
-                      e.currentTarget.style.display = "none";
-                      e.currentTarget.parentElement!.innerHTML = `
-                        <div class="text-gray-600 text-xs font-bold">NHL</div>
-                      `;
-                    };
-                  }}
                 />
               </button>
 
@@ -443,11 +434,6 @@ function App() {
                         src="/nhl-seeklogo.png"
                         alt="NHL Logo"
                         className="w-4 h-4 object-contain"
-                        onError={(e) => {
-                          e.currentTarget.src =
-                            "https://assets.nhle.com/logos/nhl/svg/nhl-logo.svg";
-                          e.currentTarget.className = "w-4 h-4 object-contain";
-                        }}
                       />
                     </div>
                     <span className="text-sm font-medium">Select Team</span>
@@ -455,25 +441,11 @@ function App() {
 
                   {/* Team options */}
                   {teams.map((team) => (
-                    <button
+                    <TeamDropdownItem
                       key={team.teamAbbrev.default}
-                      onClick={() => handleDropdownTeamSelect(team)}
-                      className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-4 bg-transparent border-none outline-none"
-                    >
-                      <div className="w-6 h-6 flex items-center justify-center">
-                        <img
-                          src={team.teamLogo}
-                          alt={team.teamName.default}
-                          className="w-full h-full object-contain"
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                          }}
-                        />
-                      </div>
-                      <span className="text-sm font-medium">
-                        {team.teamName.default}
-                      </span>
-                    </button>
+                      team={team}
+                      onSelect={handleDropdownTeamSelect}
+                    />
                   ))}
                 </div>
               )}

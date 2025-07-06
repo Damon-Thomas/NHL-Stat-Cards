@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Preload critical images */
+body::before {
+  content: "";
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  background: url("/nhl-seeklogo.png"), url("/logos/nhl/Boston_Bruins.svg"),
+    url("/logos/nhl/Toronto_Maple_Leafs.svg"),
+    url("/logos/nhl/Montreal_Canadiens.svg"),
+    url("/logos/nhl/New_York_Rangers.svg"),
+    url("/logos/nhl/Pittsburgh_Penguins.svg");
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
