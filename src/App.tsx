@@ -431,7 +431,7 @@ function App() {
                       <img
                         src="/nhl-seeklogo.png"
                         alt="NHL Logo"
-                        className="w-4 h-4 object-contain"
+                        className="w-6 h-6 object-contain"
                       />
                     </div>
                     <span className="text-sm font-medium">Select Team</span>
