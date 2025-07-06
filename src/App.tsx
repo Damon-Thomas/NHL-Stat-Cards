@@ -395,14 +395,14 @@ function App() {
     return (
       <div
         ref={playerCardRef}
-        className="w-full max-w-4xl aspect-[3/2] m-2 bg-white text-black rounded-xl p-2 grid gap-2 overflow-hidden"
+        className="w-full max-w-4xl aspect-[3/2] m-2 bg-white text-black rounded-xl p-2 sm:p-4 grid gap-2 overflow-hidden"
         style={{ gridTemplateColumns: "3fr 2fr" }}
       >
         <div className="min-w-0 overflow-hidden">
-          <div className="h-12 w-full mb-1 rounded flex items-center gap-2">
+          <div className="h-8 sm:h-12 md:h-16 lg:h-18 w-full mb-1 rounded flex items-center gap-2">
             {/* Logo container with fixed size */}
             <div
-              className="w-8 h-8 flex-shrink-0 rounded flex items-center justify-center relative"
+              className="w-8 sm:w-12 md:w-16 lg:w-18 h-8 sm:h-12 md:h-16 lg:h-18 flex-shrink-0 rounded flex items-center justify-center relative"
               ref={dropdownRef}
             >
               <button
@@ -415,7 +415,7 @@ function App() {
                   alt={
                     selectedTeam ? selectedTeam.teamName.default : "NHL Logo"
                   }
-                  className="w-8 h-8 object-contain"
+                  className="w-8 sm:w-12 md:w-16 lg:w-18 h-8 sm:h-12 md:h-16 lg:h-18 object-contain"
                 />
               </button>
 
@@ -450,20 +450,30 @@ function App() {
             </div>
 
             {/* Player name container with constrained space */}
-            <div className="h-6 flex flex-1 flex-col items-start min-w-0">
+            <div className="h-8 sm:h-12 md:h-16 lg:h-18 flex flex-1 flex-col items-start min-w-0">
               {/* Player Dropdown */}
-              <div className="w-full relative" ref={playerDropdownRef}>
+              <div
+                className="w-full h-8 sm:h-12 md:h-16 lg:h-18 flex flex-col relative"
+                ref={playerDropdownRef}
+              >
                 <button
                   onClick={() => setIsPlayerDropdownOpen(!isPlayerDropdownOpen)}
-                  className="w-full text-left bg-transparent border-none outline-none p-0 m-0"
+                  className="w-full flex-1 text-left flex items-center bg-transparent border-none outline-none p-0 m-0"
                   disabled={loading || !selectedTeam}
                 >
-                  <p className="text-sm mb-1 font-black italic tracking-wider whitespace-nowrap overflow-hidden text-ellipsis">
+                  <p className="text-xs sm:text-xl md:text-2xl lg:text-3xl mb-1 ml-1 font-black italic tracking-wider whitespace-nowrap overflow-hidden text-ellipsis">
                     {selectedPlayer
-                      ? `${selectedPlayer?.firstName.default} ${selectedPlayer?.lastName.default}`
+                      ? `${selectedPlayer?.firstName.default.toUpperCase()} ${selectedPlayer?.lastName.default.toUpperCase()}`
                       : "PLAYER NAME"}
                   </p>
                 </button>
+                <div
+                  className="h-1.5 sm:h-2 lg:h-3"
+                  style={{
+                    background: teamColorScheme.primary,
+                    clipPath: "polygon(4px 0, 100% 0, 100% 100%, 0 100%)",
+                  }}
+                ></div>
 
                 {/* Player Dropdown Menu */}
                 {isPlayerDropdownOpen && selectedTeam && roster.length > 0 && (
@@ -491,13 +501,6 @@ function App() {
                   </div>
                 )}
               </div>
-              <div
-                className="h-2 ml-1 w-full"
-                style={{
-                  background: teamColorScheme.primary,
-                  clipPath: "polygon(4px 0, 100% 0, 100% 100%, 0 100%)",
-                }}
-              ></div>
             </div>
           </div>
           <div className="h-6 bg-gray-300 w-3/4 mb-2 rounded"></div>
