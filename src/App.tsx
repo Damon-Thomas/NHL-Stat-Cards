@@ -1,15 +1,15 @@
 // War value unfocuses on change right now, but it should not
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { Team, Player } from "./types";
 import CardCount from "./components/CardCount";
 import DownloadButton from "./components/DownloadButton";
 import TeamDropdownItem from "./components/TeamDropdownItem";
 import { getTeamLogoPath } from "./utils/teamLogos";
 import { getProxiedImageUrl } from "./utils/imageProxy";
-import { interpolateColor } from "./utils/colorInterpolation";
 import "./App.css";
-import { DEFAULT_TEAM_COLORS, getTeamColors } from "./data/colors";
+import { getTeamColors } from "./data/colors";
+import StatBox from "./components/StatBox";
 
 function App() {
   const [teams, setTeams] = useState<Team[]>([]);
@@ -18,79 +18,14 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [cardCount, setCardCount] = useState<number>(0);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
-  const [statValue, setStatValue] = useState<number>(99);
+  const [WARstatValue, setWARStatValue] = useState<number>(99);
   const [inputValue, setInputValue] = useState<string>("99");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isPlayerDropdownOpen, setIsPlayerDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const playerDropdownRef = useRef<HTMLDivElement>(null);
   const playerCardRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Debounced function to update statValue
-  const debouncedSetStatValue = useCallback((value: number) => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    timeoutRef.current = setTimeout(() => {
-      setStatValue(value);
-    }, 100); // Small delay to prevent rapid re-renders
-  }, []);
-
-  // Memoize the input change handler to prevent unnecessary re-renders
-  const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      // Only allow digits 0-9
-      const cleanValue = e.target.value.replace(/[^0-9]/g, "");
-
-      // Limit to 2 characters
-      const limitedValue = cleanValue.slice(0, 2);
-
-      // Update display value immediately
-      setInputValue(limitedValue);
-
-      // Handle empty string
-      if (limitedValue === "") {
-        return; // Don't update statValue yet
-      }
-
-      // Parse and validate numeric value
-      let num = parseInt(limitedValue);
-      if (isNaN(num)) return;
-      if (num > 99) num = 99;
-      if (num < 1) num = 1;
-
-      // Only update statValue if it's different from current value
-      if (num !== statValue) {
-        debouncedSetStatValue(num);
-      }
-    },
-    [statValue, debouncedSetStatValue]
-  );
-
-  const handleInputBlur = useCallback(() => {
-    // Clear any pending timeout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    // On blur, ensure we have a valid value
-    if (inputValue === "" || parseInt(inputValue) < 1) {
-      setStatValue(1);
-      setInputValue("1");
-    } else {
-      // Ensure inputValue reflects the actual statValue
-      const num = parseInt(inputValue);
-      if (num > 99) {
-        setStatValue(99);
-        setInputValue("99");
-      } else if (num >= 1) {
-        setStatValue(num);
-        setInputValue(num.toString());
-      }
-    }
-  }, [inputValue]);
 
   // Get the local logo path for the selected team
   const selectedTeamLogoUrl = getTeamLogoPath(selectedTeam?.teamAbbrev.default);
@@ -254,22 +189,6 @@ function App() {
   };
 
   const PlayerCard = () => {
-    let heightFeet = 0;
-    let heightInches = 0;
-    let age = 0;
-    let selectedTeamInfo: Team | null = null;
-    let teamColorScheme = DEFAULT_TEAM_COLORS;
-    if (selectedPlayer && selectedTeam) {
-      heightFeet = Math.floor(selectedPlayer.heightInInches / 12);
-      heightInches = selectedPlayer.heightInInches % 12;
-
-      // Get team colors
-      teamColorScheme = getTeamColors(selectedTeam?.teamAbbrev.default ?? "");
-
-      // Get team info
-      selectedTeamInfo = selectedTeam;
-    }
-
     function formatAge(age: string | undefined): number {
       if (!age) return 0; // Handle undefined or null age
       return new Date().getFullYear() - new Date(age).getFullYear();
@@ -312,6 +231,10 @@ function App() {
       }
       return position; // Handle other cases
     }
+
+    const teamColorScheme = getTeamColors(
+      selectedTeam?.teamAbbrev.default ?? ""
+    );
 
     return (
       <div
@@ -438,36 +361,10 @@ function App() {
                 className="w-full h-auto object-contain"
               />
             </div>
-            <div className="flex flex-col min-w-0 sm:pt-2 text-xs sm:text-base md:text-xl max-w-full">
-              <p className="text-nowrap overflow-hidden text-ellipsis tracking-tighter">
-                Proj WAR%
-              </p>
-              <div
-                className="flex justify-center items-center mt-2 gap-0 flex-1 max-w-full text-xs sm:text-xl md:text-6xl"
-                style={{ backgroundColor: interpolateColor(statValue, "blue") }}
-              >
-                <input
-                  ref={inputRef}
-                  type="text"
-                  maxLength={2}
-                  pattern="[0-9]*"
-                  inputMode="numeric"
-                  className="bg-transparent h-full text-center border-none outline-none font-black"
-                  style={{
-                    appearance: "textfield",
-                    MozAppearance: "textfield",
-                    WebkitAppearance: "none",
-                    width: "2ch",
-                    minWidth: "2ch",
-                    maxWidth: "100%",
-                  }}
-                  value={inputValue}
-                  onChange={handleInputChange}
-                  onBlur={handleInputBlur}
-                />
-                <p className="h-full flex items-center font-bold ">%</p>
-              </div>
-            </div>
+            <StatBox
+              statValue={WARstatValue}
+              setStatValue={setWARStatValue}
+            ></StatBox>
 
             <div className="grid grid-rows-4 text-xs sm:text-base md:text-xl min-w-0">
               <div className="flex items-center gap-2 sm:gap-4">
