@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import type { Team, Player } from "./types";
 import CardCount from "./components/CardCount";
 import DownloadButton from "./components/DownloadButton";
+import OptimisticImage from "./components/OptimisticImage";
 import TeamDropdownItem from "./components/TeamDropdownItem";
 import { getTeamLogoPath } from "./utils/teamLogos";
 import { getProxiedImageUrl } from "./utils/imageProxy";
@@ -379,12 +380,17 @@ function App() {
             style={{ gridTemplateColumns: "1fr 1fr 1fr" }}
           >
             <div className="min-w-0">
-              <img
+              <OptimisticImage
                 src={
                   getProxiedImageUrl(selectedPlayer?.headshot) ||
                   "/default-skater.png"
                 }
-                alt={selectedTeam ? selectedTeam.teamName.default : "NHL Logo"}
+                fallbackSrc="/default-skater.png"
+                alt={
+                  selectedPlayer
+                    ? `${selectedPlayer.firstName.default} ${selectedPlayer.lastName.default}`
+                    : "NHL Player"
+                }
                 className="w-full h-auto object-contain"
               />
             </div>
