@@ -18,8 +18,19 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [cardCount, setCardCount] = useState<number>(0);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
-  const [WARstatValue, setWARStatValue] = useState<number>(99);
-  const [inputValue, setInputValue] = useState<string>("99");
+
+  const [warstatValue, setWARStatValue] = useState<number>(99);
+  const [evostatValue, setEVOstatValue] = useState<number>(99);
+  const [evdstatValue, setEVDstatValue] = useState<number>(99);
+  const [ppstatValue, setPPstatValue] = useState<number>(99);
+  const [pkstatValue, setPKStatValue] = useState<number>(99);
+  const [finstatValue, setFINStatValue] = useState<number>(99);
+  const [goalstatValue, setGOALStatValue] = useState<number>(99);
+  const [fasstatValue, setFASStatValue] = useState<number>(99);
+  const [penstatValue, setPENStatValue] = useState<number>(99);
+  const [compstatValue, setCOMPStatValue] = useState<number>(99);
+  const [teamstatValue, setTEAMStatValue] = useState<number>(99);
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isPlayerDropdownOpen, setIsPlayerDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -27,6 +38,22 @@ function App() {
   const playerCardRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const expandedStats = [
+    { statLabel: "EV Offense", stat: evostatValue, setStat: setEVOstatValue },
+    { statLabel: "EV Defense", stat: evdstatValue, setStat: setEVDstatValue },
+    { statLabel: "PP", stat: ppstatValue, setStat: setPPstatValue },
+    { statLabel: "PK", stat: pkstatValue, setStat: setPKStatValue },
+    { statLabel: "Finishing", stat: finstatValue, setStat: setFINStatValue },
+    { statLabel: "Goals", stat: goalstatValue, setStat: setGOALStatValue },
+    { statLabel: "1st Assists", stat: fasstatValue, setStat: setFASStatValue },
+    { statLabel: "Penalties", stat: penstatValue, setStat: setPENStatValue },
+    {
+      statLabel: "Competition",
+      stat: compstatValue,
+      setStat: setCOMPStatValue,
+    },
+    { statLabel: "Teammates", stat: teamstatValue, setStat: setTEAMStatValue },
+  ];
   // Get the local logo path for the selected team
   const selectedTeamLogoUrl = getTeamLogoPath(selectedTeam?.teamAbbrev.default);
 
@@ -239,10 +266,10 @@ function App() {
     return (
       <div
         ref={playerCardRef}
-        className="w-full max-w-4xl aspect-[3/2] m-2 bg-white text-black rounded-xl p-2 sm:p-4 grid gap-2 overflow-hidden"
+        className="w-full max-w-6xl h-fit bg-white text-black rounded-xl p-2 sm:p-4 grid gap-2 overflow-hidden"
         style={{ gridTemplateColumns: "3fr 2fr" }}
       >
-        <div className="min-w-0 overflow-hidden pt-2">
+        <div className="min-w-0 overflow-hidden pt-2 flex flex-col sm:gap-2 md:gap-4">
           <div className="h-8 sm:h-12 md:h-16 lg:h-18 w-full mb-1 rounded flex items-center gap-2">
             {/* Logo container with fixed size */}
             <div
@@ -362,13 +389,14 @@ function App() {
               />
             </div>
             <StatBox
-              statValue={WARstatValue}
+              statValue={warstatValue}
               setStatValue={setWARStatValue}
+              large={true}
             ></StatBox>
 
-            <div className="grid grid-rows-4 text-xs sm:text-base md:text-xl min-w-0">
-              <div className="flex items-center gap-2 sm:gap-4">
-                <p className="flex-2 ">Pos:</p>
+            <div className="grid grid-rows-4 text-xs sm:text-base md:text-2xl min-w-0">
+              <div className="flex items-center justify-center gap-2 sm:gap-4">
+                <p className="flex- ">Pos:</p>
                 <p className="flex-1 font-black text-left">
                   {formatPosition(selectedPlayer?.positionCode)}
                 </p>
@@ -393,6 +421,16 @@ function App() {
               </div>
             </div>
           </div>
+          <div className="grid grid-cols-5 grid-rows-2 gap-1 sm:gap-2 md:gap-6 w-full min-w-0">
+            {expandedStats.map((stat, index) => (
+              <StatBox
+                key={index}
+                statLabel={stat.statLabel}
+                statValue={stat.stat}
+                setStatValue={stat.setStat}
+              />
+            ))}
+          </div>
         </div>
         <div className="bg-purple-400 p-4 flex items-center justify-center min-w-0 overflow-hidden"></div>
       </div>
@@ -400,8 +438,8 @@ function App() {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col items-center justify-start overflow-auto pt-24 px-1 sm:px-4">
-      <div className="fixed top-0 left-0 h-20 w-screen p-2 bg-white text-black shadow-lg z-10 flex justify-around items-center">
+    <div className="h-screen w-full flex flex-col items-center justify-start overflow-auto ">
+      <div className="fixed top-0 left-0 h-20 w-full p-2 bg-white text-black shadow-lg z-10 flex justify-around items-center">
         <CardCount count={cardCount} />
         <DownloadButton
           elementRef={playerCardRef}
@@ -410,7 +448,9 @@ function App() {
           className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
         />
       </div>
-      <PlayerCard />
+      <div className="pt-24 px-1 sm:px-4 w-full flex justify-center">
+        <PlayerCard />
+      </div>
     </div>
   );
 }

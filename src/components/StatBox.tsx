@@ -4,9 +4,13 @@ import { interpolateColor } from "../utils/colorInterpolation";
 export default function StatBox({
   statValue,
   setStatValue,
+  statLabel = "Proj WAR%",
+  large = false,
 }: {
   statValue: number;
   setStatValue?: (value: number) => void;
+  statLabel?: string;
+  large?: boolean;
 }) {
   const [inputValue, setInputValue] = useState(
     statValue.toString().padStart(2, "0")
@@ -38,13 +42,23 @@ export default function StatBox({
     }
   };
 
+  const numberClasses = large
+    ? " text-xl sm:text-3xl md:text-6xl h-full"
+    : "text-xs sm:text-base md:text-4xl ";
+
+  const titleClasses = large
+    ? "text-xs sm:text-lg md:text-xl h-full"
+    : "text-xs sm:text-base md:text-xl ";
+
+  const baseClasses = large ? "flex-1" : "py-2 sm:py-4 md:py-6 w-full";
+
   return (
-    <div className="flex flex-col min-w-0 sm:pt-2 text-xs sm:text-base md:text-xl max-w-full">
-      <p className="text-nowrap overflow-hidden text-ellipsis tracking-tighter">
-        Proj WAR%
+    <div className={`flex flex-col min-w-0 max-w-full ${titleClasses}`}>
+      <p className={`text-nowrap overflow-hidden tracking-tighter`}>
+        {statLabel}
       </p>
       <div
-        className="flex justify-center items-center mt-2 gap-0 flex-1 max-w-full text-xs sm:text-xl md:text-6xl"
+        className={`flex justify-center items-center mt-2 gap-0 max-w-full ${baseClasses}`}
         style={{ backgroundColor }}
       >
         <input
@@ -52,7 +66,7 @@ export default function StatBox({
           maxLength={2}
           pattern="[0-9]*"
           inputMode="numeric"
-          className="bg-transparent h-full text-center border-none outline-none font-black"
+          className={`bg-transparent  text-center border-none outline-none font-black ${numberClasses}`}
           style={{
             appearance: "textfield",
             MozAppearance: "textfield",
@@ -65,7 +79,9 @@ export default function StatBox({
           onChange={handleChange}
           onBlur={handleBlur}
         />
-        <p className="h-full flex items-center font-bold ">%</p>
+        <p className={`h-full flex items-center font-bold ${numberClasses}`}>
+          %
+        </p>
       </div>
     </div>
   );
