@@ -363,8 +363,39 @@ function App() {
                 className="w-full h-auto object-contain"
               />
             </div>
-            <div className="flex flex-col min-w-0 sm:pt-2 text-xs sm:text-base md:text-xl">
-              <p className=" text-nowrap overflow-hidden">Proj WAR%</p>
+            <div className="flex flex-col min-w-0 sm:pt-2 text-xs sm:text-base md:text-xl max-w-full">
+              <p className="text-nowrap overflow-hidden text-ellipsis">
+                Proj WAR%
+              </p>
+              <div className="flex justify-center items-center gap-0 flex-1 max-w-full font-black text-xs sm:text:xl md:text-6xl">
+                <input
+                  type="text"
+                  maxLength={2}
+                  pattern="[0-9]*"
+                  inputMode="numeric"
+                  className="bg-transparent h-full text-center border-none outline-none"
+                  style={{
+                    appearance: "textfield",
+                    MozAppearance: "textfield",
+                    WebkitAppearance: "none",
+                    width: "2ch",
+                    minWidth: "2ch",
+                    maxWidth: "100%",
+                  }}
+                  defaultValue="99"
+                  onInput={(e) => {
+                    // Only allow digits 0-9
+                    e.currentTarget.value = e.currentTarget.value.replace(
+                      /[^0-9]/g,
+                      ""
+                    );
+                    // Ensure value doesn't exceed 99
+                    const num = parseInt(e.currentTarget.value);
+                    if (num > 99) e.currentTarget.value = "99";
+                  }}
+                />
+                <p className="h-full flex items-center">%</p>
+              </div>
             </div>
 
             <div className="grid grid-rows-4 text-xs sm:text-base md:text-xl min-w-0">
