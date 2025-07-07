@@ -344,3 +344,24 @@ export const usePNGDownload = () => {
 
   return { downloadAsPNG };
 };
+
+// Future handleDownload function using modern-screenshot
+// Uncomment this when you have a 2nd hidden card element
+// Use this for consistently sized pngs
+
+// const handleDownload = async () => {
+//   const element = document.getElementById('hidden-card');
+
+//   if (!element) return;
+
+//   const png = await modernScreenshot.domToPng(element, {
+//     width: 800,
+//     height: 450,
+//     scale: 2, // for high-res export
+//   });
+
+//   const link = document.createElement('a');
+//   link.href = png;
+//   link.download = 'stat-card.png';
+//   link.click();
+// };

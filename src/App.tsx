@@ -307,7 +307,7 @@ function App() {
                   className="w-full flex-1 text-left flex items-center bg-transparent border-none outline-none p-0 m-0"
                   disabled={loading || !selectedTeam}
                 >
-                  <p className="text-xs sm:text-xl md:text-2xl lg:text-3xl mb-1 ml-1 font-black italic tracking-wider whitespace-nowrap overflow-hidden text-ellipsis">
+                  <p className="text-xs w-full sm:text-xl md:text-2xl lg:text-3xl mb-1 ml-1 font-black italic tracking-wider whitespace-nowrap overflow-hidden text-ellipsis">
                     {selectedPlayer
                       ? `${selectedPlayer?.firstName.default.toUpperCase()} ${selectedPlayer?.lastName.default.toUpperCase()}`
                       : "PLAYER NAME"}
@@ -414,6 +414,37 @@ function App() {
       <PlayerCard />
     </div>
   );
+}
+
+// KEEP
+// implement a hidden statcar later for consistently sized and high quality pngs
+{
+  /* <StatCard
+  name={userName}
+  team={userTeam}
+  stats={userStats}
+  playerImage={userImage}
+/>
+
+<div
+  id="hidden-card"
+  style={{
+    position: 'absolute',
+    top: '-9999px',
+    left: '-9999px',
+    width: '800px',
+    height: '450px',
+    overflow: 'hidden',
+    pointerEvents: 'none',
+  }}
+>
+  <StatCard
+    name={userName}
+    team={userTeam}
+    stats={userStats}
+    playerImage={userImage}
+  />
+</div> */
 }
 
 export default App;
