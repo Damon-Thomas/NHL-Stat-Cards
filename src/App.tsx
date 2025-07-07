@@ -1,10 +1,13 @@
-import { useState, useEffect, useRef } from "react";
+// War value unfocuses on change right now, but it should not
+
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import type { Team, Player } from "./types";
 import CardCount from "./components/CardCount";
 import DownloadButton from "./components/DownloadButton";
 import TeamDropdownItem from "./components/TeamDropdownItem";
 import { getTeamLogoPath } from "./utils/teamLogos";
 import { getProxiedImageUrl } from "./utils/imageProxy";
+import { interpolateColor } from "./utils/colorInterpolation";
 import "./App.css";
 import { DEFAULT_TEAM_COLORS, getTeamColors } from "./data/colors";
 
@@ -15,11 +18,79 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [cardCount, setCardCount] = useState<number>(0);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [statValue, setStatValue] = useState<number>(99);
+  const [inputValue, setInputValue] = useState<string>("99");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isPlayerDropdownOpen, setIsPlayerDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const playerDropdownRef = useRef<HTMLDivElement>(null);
   const playerCardRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Debounced function to update statValue
+  const debouncedSetStatValue = useCallback((value: number) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      setStatValue(value);
+    }, 100); // Small delay to prevent rapid re-renders
+  }, []);
+
+  // Memoize the input change handler to prevent unnecessary re-renders
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      // Only allow digits 0-9
+      const cleanValue = e.target.value.replace(/[^0-9]/g, "");
+
+      // Limit to 2 characters
+      const limitedValue = cleanValue.slice(0, 2);
+
+      // Update display value immediately
+      setInputValue(limitedValue);
+
+      // Handle empty string
+      if (limitedValue === "") {
+        return; // Don't update statValue yet
+      }
+
+      // Parse and validate numeric value
+      let num = parseInt(limitedValue);
+      if (isNaN(num)) return;
+      if (num > 99) num = 99;
+      if (num < 1) num = 1;
+
+      // Only update statValue if it's different from current value
+      if (num !== statValue) {
+        debouncedSetStatValue(num);
+      }
+    },
+    [statValue, debouncedSetStatValue]
+  );
+
+  const handleInputBlur = useCallback(() => {
+    // Clear any pending timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    // On blur, ensure we have a valid value
+    if (inputValue === "" || parseInt(inputValue) < 1) {
+      setStatValue(1);
+      setInputValue("1");
+    } else {
+      // Ensure inputValue reflects the actual statValue
+      const num = parseInt(inputValue);
+      if (num > 99) {
+        setStatValue(99);
+        setInputValue("99");
+      } else if (num >= 1) {
+        setStatValue(num);
+        setInputValue(num.toString());
+      }
+    }
+  }, [inputValue]);
 
   // Get the local logo path for the selected team
   const selectedTeamLogoUrl = getTeamLogoPath(selectedTeam?.teamAbbrev.default);
@@ -50,6 +121,10 @@ function App() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      // Clean up timeout on unmount
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
     };
   }, []);
 
@@ -350,7 +425,7 @@ function App() {
             </div>
           </div>
           <div
-            className="h-auto w-full mb-2 grid gap-2"
+            className="h-auto w-full mb-2 grid gap-2 sm:gap-4 md:gap-6"
             style={{ gridTemplateColumns: "1fr 1fr 1fr" }}
           >
             <div className="min-w-0">
@@ -364,16 +439,20 @@ function App() {
               />
             </div>
             <div className="flex flex-col min-w-0 sm:pt-2 text-xs sm:text-base md:text-xl max-w-full">
-              <p className="text-nowrap overflow-hidden text-ellipsis">
+              <p className="text-nowrap overflow-hidden text-ellipsis tracking-tighter">
                 Proj WAR%
               </p>
-              <div className="flex justify-center items-center gap-0 flex-1 max-w-full font-black text-xs sm:text:xl md:text-6xl">
+              <div
+                className="flex justify-center items-center mt-2 gap-0 flex-1 max-w-full text-xs sm:text-xl md:text-6xl"
+                style={{ backgroundColor: interpolateColor(statValue, "blue") }}
+              >
                 <input
+                  ref={inputRef}
                   type="text"
                   maxLength={2}
                   pattern="[0-9]*"
                   inputMode="numeric"
-                  className="bg-transparent h-full text-center border-none outline-none"
+                  className="bg-transparent h-full text-center border-none outline-none font-black"
                   style={{
                     appearance: "textfield",
                     MozAppearance: "textfield",
@@ -382,19 +461,11 @@ function App() {
                     minWidth: "2ch",
                     maxWidth: "100%",
                   }}
-                  defaultValue="99"
-                  onInput={(e) => {
-                    // Only allow digits 0-9
-                    e.currentTarget.value = e.currentTarget.value.replace(
-                      /[^0-9]/g,
-                      ""
-                    );
-                    // Ensure value doesn't exceed 99
-                    const num = parseInt(e.currentTarget.value);
-                    if (num > 99) e.currentTarget.value = "99";
-                  }}
+                  value={inputValue}
+                  onChange={handleInputChange}
+                  onBlur={handleInputBlur}
                 />
-                <p className="h-full flex items-center">%</p>
+                <p className="h-full flex items-center font-bold ">%</p>
               </div>
             </div>
 

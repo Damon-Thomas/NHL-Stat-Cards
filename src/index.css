@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Roboto Slab Variable Font */
+@font-face {
+  font-family: "Roboto Slab";
+  src: url("/Roboto_Slab/RobotoSlab-VariableFont_wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --maxBlue: #79bef8;
+  --maxRed: #fe4f6d;
+  --neutral: #f6f6f6;
+}
+
 /* High-quality rendering optimizations */
 * {
   image-rendering: -webkit-optimize-contrast;
@@ -19,6 +34,7 @@ input::-webkit-inner-spin-button {
 
 /* Hide spin buttons in Firefox */
 input[type="number"] {
+  appearance: textfield;
   -moz-appearance: textfield;
 }
 
@@ -54,7 +70,7 @@ body::before {
 }
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Roboto Slab", Georgia, "Times New Roman", serif;
   line-height: 1.5;
   font-weight: 400;
 
