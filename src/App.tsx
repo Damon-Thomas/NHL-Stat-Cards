@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import type { Team, Player, PlayerCardData } from "./types";
+import type { Team, Player } from "./types";
 import CardCount from "./components/CardCount";
 import DownloadButton from "./components/DownloadButton";
 import TeamDropdownItem from "./components/TeamDropdownItem";
 import { getTeamLogoPath } from "./utils/teamLogos";
+import { getProxiedImageUrl } from "./utils/imageProxy";
 import "./App.css";
 import { DEFAULT_TEAM_COLORS, getTeamColors } from "./data/colors";
 
@@ -12,7 +13,6 @@ function App() {
   const [selectedTeam, setSelectedTeam] = useState<Team | null>();
   const [roster, setRoster] = useState<Player[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>("");
   const [cardCount, setCardCount] = useState<number>(0);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -20,60 +20,6 @@ function App() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const playerDropdownRef = useRef<HTMLDivElement>(null);
   const playerCardRef = useRef<HTMLDivElement>(null);
-  const [playerCardData, setPlayerCardData] = useState<PlayerCardData>({
-    projWAR: "",
-    evOffence: "",
-    evDefence: "",
-    pp: "",
-    pk: "",
-    finishing: "",
-    goals: "",
-    firstAssists: "",
-    penalties: "",
-    competition: "",
-    teammates: "",
-    warPercentileRankYr1: "",
-    warPercentileRankYr2: "",
-    warPercentileRankYr3: "",
-    offenseYr1: "",
-    offenseYr2: "",
-    offenseYr3: "",
-    defenseYr1: "",
-    defenseYr2: "",
-    defenseYr3: "",
-    finishingYr1: "",
-    finishingYr2: "",
-    finishingYr3: "",
-  });
-
-  // State to track which fields are set to NA
-  const [naFields, setNaFields] = useState<
-    Record<keyof PlayerCardData, boolean>
-  >({
-    projWAR: false,
-    evOffence: false,
-    evDefence: false,
-    pp: false,
-    pk: false,
-    finishing: false,
-    goals: false,
-    firstAssists: false,
-    penalties: false,
-    competition: false,
-    teammates: false,
-    warPercentileRankYr1: false,
-    warPercentileRankYr2: false,
-    warPercentileRankYr3: false,
-    offenseYr1: false,
-    offenseYr2: false,
-    offenseYr3: false,
-    defenseYr1: false,
-    defenseYr2: false,
-    defenseYr3: false,
-    finishingYr1: false,
-    finishingYr2: false,
-    finishingYr3: false,
-  });
 
   // Get the local logo path for the selected team
   const selectedTeamLogoUrl = getTeamLogoPath(selectedTeam?.teamAbbrev.default);
@@ -119,7 +65,7 @@ function App() {
       console.log("Fetched teams:", data);
       setTeams(data.standings || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch teams");
+      console.log(err instanceof Error ? err.message : "Failed to fetch teams");
     } finally {
       setLoading(false);
     }
@@ -128,7 +74,6 @@ function App() {
   const fetchRoster = async (teamId: string) => {
     try {
       setLoading(true);
-      setError("");
       const response = await fetch(`/api/get-roster?teamId=${teamId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch roster");
@@ -156,7 +101,9 @@ function App() {
 
       setRoster(players);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch roster");
+      console.log(
+        err instanceof Error ? err.message : "Failed to fetch roster"
+      );
     } finally {
       setLoading(false);
     }
@@ -219,7 +166,6 @@ function App() {
     setSelectedPlayer(player);
     setIsPlayerDropdownOpen(false); // Close dropdown after selection
     // Clear form data when selecting a new player
-    clearAllValues();
     incrementCount(); // Increment count when a player card is created
   };
 
@@ -230,147 +176,6 @@ function App() {
       setSelectedPlayer(null);
       setIsPlayerDropdownOpen(false);
     }
-  };
-
-  const handleInputChange = (field: keyof PlayerCardData, value: string) => {
-    setPlayerCardData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  // Handle NA checkbox changes
-  const handleNaToggle = (field: keyof PlayerCardData) => {
-    setNaFields((prev) => {
-      const newNaFields = { ...prev, [field]: !prev[field] };
-
-      // If NA is checked, set the field value to "N/A", otherwise clear it
-      if (newNaFields[field]) {
-        setPlayerCardData((prevData) => ({
-          ...prevData,
-          [field]: "N/A",
-        }));
-      } else {
-        setPlayerCardData((prevData) => ({
-          ...prevData,
-          [field]: "",
-        }));
-      }
-
-      return newNaFields;
-    });
-  };
-
-  // Autofill all fields with max value (99)
-  const autofillMaxValues = () => {
-    const maxValues: PlayerCardData = {
-      projWAR: "99",
-      evOffence: "99",
-      evDefence: "99",
-      pp: "99",
-      pk: "99",
-      finishing: "99",
-      goals: "99",
-      firstAssists: "99",
-      penalties: "99",
-      competition: "99",
-      teammates: "99",
-      warPercentileRankYr1: "99",
-      warPercentileRankYr2: "99",
-      warPercentileRankYr3: "99",
-      offenseYr1: "99",
-      offenseYr2: "99",
-      offenseYr3: "99",
-      defenseYr1: "99",
-      defenseYr2: "99",
-      defenseYr3: "99",
-      finishingYr1: "99",
-      finishingYr2: "99",
-      finishingYr3: "99",
-    };
-
-    setPlayerCardData(maxValues);
-    // Clear all NA flags when autofilling
-    setNaFields({
-      projWAR: false,
-      evOffence: false,
-      evDefence: false,
-      pp: false,
-      pk: false,
-      finishing: false,
-      goals: false,
-      firstAssists: false,
-      penalties: false,
-      competition: false,
-      teammates: false,
-      warPercentileRankYr1: false,
-      warPercentileRankYr2: false,
-      warPercentileRankYr3: false,
-      offenseYr1: false,
-      offenseYr2: false,
-      offenseYr3: false,
-      defenseYr1: false,
-      defenseYr2: false,
-      defenseYr3: false,
-      finishingYr1: false,
-      finishingYr2: false,
-      finishingYr3: false,
-    });
-  };
-
-  // Clear all form data
-  const clearAllValues = () => {
-    setPlayerCardData({
-      projWAR: "",
-      evOffence: "",
-      evDefence: "",
-      pp: "",
-      pk: "",
-      finishing: "",
-      goals: "",
-      firstAssists: "",
-      penalties: "",
-      competition: "",
-      teammates: "",
-      warPercentileRankYr1: "",
-      warPercentileRankYr2: "",
-      warPercentileRankYr3: "",
-      offenseYr1: "",
-      offenseYr2: "",
-      offenseYr3: "",
-      defenseYr1: "",
-      defenseYr2: "",
-      defenseYr3: "",
-      finishingYr1: "",
-      finishingYr2: "",
-      finishingYr3: "",
-    });
-
-    setNaFields({
-      projWAR: false,
-      evOffence: false,
-      evDefence: false,
-      pp: false,
-      pk: false,
-      finishing: false,
-      goals: false,
-      firstAssists: false,
-      penalties: false,
-      competition: false,
-      teammates: false,
-      warPercentileRankYr1: false,
-      warPercentileRankYr2: false,
-      warPercentileRankYr3: false,
-      offenseYr1: false,
-      offenseYr2: false,
-      offenseYr3: false,
-      defenseYr1: false,
-      defenseYr2: false,
-      defenseYr3: false,
-      finishingYr1: false,
-      finishingYr2: false,
-      finishingYr3: false,
-    });
   };
 
   const PlayerCard = () => {
@@ -439,7 +244,7 @@ function App() {
         className="w-full max-w-4xl aspect-[3/2] m-2 bg-white text-black rounded-xl p-2 sm:p-4 grid gap-2 overflow-hidden"
         style={{ gridTemplateColumns: "3fr 2fr" }}
       >
-        <div className="min-w-0 overflow-hidden">
+        <div className="min-w-0 overflow-hidden pt-2">
           <div className="h-8 sm:h-12 md:h-16 lg:h-18 w-full mb-1 rounded flex items-center gap-2">
             {/* Logo container with fixed size */}
             <div
@@ -544,34 +349,46 @@ function App() {
               </div>
             </div>
           </div>
-          <div className="h-auto w-full mb-2 grid grid-cols-[1fr_1fr_1fr] gap-2">
-            <img
-              src={selectedPlayer?.headshot || "/default-skater.png"}
-              alt={selectedTeam ? selectedTeam.teamName.default : "NHL Logo"}
-              className=" h-auto object-contain"
-            />
-            <div className="h-4 bg-gray-300 rounded"></div>
+          <div
+            className="h-auto w-full mb-2 grid gap-2"
+            style={{ gridTemplateColumns: "1fr 1fr 1fr" }}
+          >
+            <div className="min-w-0">
+              <img
+                src={
+                  getProxiedImageUrl(selectedPlayer?.headshot) ||
+                  "/default-skater.png"
+                }
+                alt={selectedTeam ? selectedTeam.teamName.default : "NHL Logo"}
+                className="w-full h-auto object-contain"
+              />
+            </div>
+            <div className="flex flex-col min-w-0 sm:pt-2 text-xs sm:text-base md:text-xl">
+              <p className=" text-nowrap overflow-hidden">Proj WAR%</p>
+            </div>
 
-            <div className="grid grid-rows-4">
-              <div className="flex items-center">
-                <p className="flex-2">POS:</p>
-                <p className="flex-1">
+            <div className="grid grid-rows-4 text-xs sm:text-base md:text-xl min-w-0">
+              <div className="flex items-center gap-2 sm:gap-4">
+                <p className="flex-2 ">Pos:</p>
+                <p className="flex-1 font-black text-left">
                   {formatPosition(selectedPlayer?.positionCode)}
                 </p>
               </div>
-              <div className="flex items-center">
-                <p className="flex-2">AGE:</p>
-                <p className="flex-1">{formatAge(selectedPlayer?.birthDate)}</p>
+              <div className="flex items-center gap-2 sm:gap-4">
+                <p className="flex-2 ">Age:</p>
+                <p className="flex-1 font-black text-left">
+                  {formatAge(selectedPlayer?.birthDate)}
+                </p>
               </div>
-              <div className="flex items-center">
-                <p className="flex-2">HND:</p>
-                <p className="flex-1">
+              <div className="flex items-center gap-2 sm:gap-4">
+                <p className="flex-2">Hnd:</p>
+                <p className="flex-1 font-black text-left">
                   {formatHandedness(selectedPlayer?.shootsCatches)}
                 </p>
               </div>
-              <div className="flex items-center">
-                <p className="flex-2">HGT:</p>
-                <p className="flex-1">
+              <div className="flex items-center gap-2 sm:gap-6">
+                <p className="flex-2">Hgt:</p>
+                <p className="flex-1 font-black text-left">
                   {inchesToFeet(selectedPlayer?.heightInInches)}
                 </p>
               </div>
