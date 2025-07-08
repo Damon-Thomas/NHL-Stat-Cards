@@ -20,18 +20,6 @@ function App() {
   const [cardCount, setCardCount] = useState<number>(0);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
 
-  const [warstatValue, setWARStatValue] = useState<number>(99);
-  const [evostatValue, setEVOstatValue] = useState<number>(99);
-  const [evdstatValue, setEVDstatValue] = useState<number>(99);
-  const [ppstatValue, setPPstatValue] = useState<number>(99);
-  const [pkstatValue, setPKStatValue] = useState<number>(99);
-  const [finstatValue, setFINStatValue] = useState<number>(99);
-  const [goalstatValue, setGOALStatValue] = useState<number>(99);
-  const [fasstatValue, setFASStatValue] = useState<number>(99);
-  const [penstatValue, setPENStatValue] = useState<number>(99);
-  const [compstatValue, setCOMPStatValue] = useState<number>(99);
-  const [teamstatValue, setTEAMStatValue] = useState<number>(99);
-
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isPlayerDropdownOpen, setIsPlayerDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -39,25 +27,21 @@ function App() {
   const playerCardRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const expandedStats = [
-    { statLabel: "EV Offense", stat: evostatValue, setStat: setEVOstatValue },
-    { statLabel: "EV Defense", stat: evdstatValue, setStat: setEVDstatValue },
-    { statLabel: "PP", stat: ppstatValue, setStat: setPPstatValue },
-    { statLabel: "PK", stat: pkstatValue, setStat: setPKStatValue },
-    { statLabel: "Finishing", stat: finstatValue, setStat: setFINStatValue },
-    { statLabel: "Goals", stat: goalstatValue, setStat: setGOALStatValue },
-    { statLabel: "1st Assists", stat: fasstatValue, setStat: setFASStatValue },
-    { statLabel: "Penalties", stat: penstatValue, setStat: setPENStatValue },
-    {
-      statLabel: "Competition",
-      stat: compstatValue,
-      setStat: setCOMPStatValue,
-    },
-    { statLabel: "Teammates", stat: teamstatValue, setStat: setTEAMStatValue },
-  ];
   // Get the local logo path for the selected team
   const selectedTeamLogoUrl = getTeamLogoPath(selectedTeam?.teamAbbrev.default);
 
+  const otherStats = [
+    "EV Offense",
+    "EV Defense",
+    "PP",
+    "PK",
+    "Finishing",
+    "Goals",
+    "1st Assists",
+    "Penalties",
+    "Competition",
+    "Teammates",
+  ];
   // Fetch all NHL teams on component mount
   useEffect(() => {
     fetchTeams();
@@ -394,11 +378,7 @@ function App() {
                 className="w-full h-auto object-contain"
               />
             </div>
-            <StatBox
-              statValue={warstatValue}
-              setStatValue={setWARStatValue}
-              large={true}
-            ></StatBox>
+            <StatBox large={true}></StatBox>
 
             <div className="grid grid-rows-4 text-xs sm:text-base md:text-2xl min-w-0">
               <div className="flex items-center justify-center gap-2 sm:gap-4">
@@ -428,13 +408,8 @@ function App() {
             </div>
           </div>
           <div className="grid grid-cols-5 grid-rows-2 gap-1 sm:gap-2 md:gap-6 w-full min-w-0">
-            {expandedStats.map((stat, index) => (
-              <StatBox
-                key={index}
-                statLabel={stat.statLabel}
-                statValue={stat.stat}
-                setStatValue={stat.setStat}
-              />
+            {otherStats.map((stat, index) => (
+              <StatBox key={index} statName={stat} large={false} />
             ))}
           </div>
         </div>

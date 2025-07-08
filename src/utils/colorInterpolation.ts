@@ -1,50 +1,36 @@
 /**
- * Interpolates between colors based on a value (1-99)
- * @param value - The value (1-99) to interpolate for
+ * Interpolates between colors based on a value (0-99)
+ * @param value - The value (0-99) to interpolate for
  * @param scale - The scale type: 'blue' for high values = blue, 'red' for high values = red
  * @returns The interpolated color as a hex string
  */
-export function interpolateColor(
-  value: number,
-  scale: "blue" | "red" = "blue"
-): string {
-  // Clamp value between 1 and 99
-  const clampedValue = Math.max(1, Math.min(99, value));
+export function interpolateColor(value: number): string {
+  // Clamp value between 0 and 99
+  const clampedValue = Math.max(0, Math.min(99, value));
 
   // Define colors (hex values from CSS variables)
   const maxBlue = "#79bef8";
   const maxRed = "#fe4f6d";
   const neutral = "#f6f6f6";
 
-  // Calculate interpolation factor (0 to 1)
-  // Values 1-49 interpolate from max color to neutral
-  // Values 50-99 interpolate from neutral to max color
+  // Ensure exact colors at key points
+  if (clampedValue === 0) return neutral;
+  if (clampedValue === 99) return maxBlue;
+  if (clampedValue === 50) return neutral;
+
   let factor: number;
   let startColor: string;
   let endColor: string;
 
-  if (scale === "blue") {
-    // For blue scale: 1 = red, 50 = neutral, 99 = blue
-    if (clampedValue <= 50) {
-      factor = (50 - clampedValue) / 49; // 1 -> 1, 50 -> 0
-      startColor = neutral;
-      endColor = maxRed;
-    } else {
-      factor = (clampedValue - 50) / 49; // 50 -> 0, 99 -> 1
-      startColor = neutral;
-      endColor = maxBlue;
-    }
+  // 0 = red, 50 = neutral, 99 = blue
+  if (clampedValue <= 50) {
+    factor = clampedValue / 50; // 0 -> 0, 50 -> 1
+    startColor = maxRed;
+    endColor = neutral;
   } else {
-    // For red scale: 1 = blue, 50 = neutral, 99 = red
-    if (clampedValue <= 50) {
-      factor = (50 - clampedValue) / 49; // 1 -> 1, 50 -> 0
-      startColor = neutral;
-      endColor = maxBlue;
-    } else {
-      factor = (clampedValue - 50) / 49; // 50 -> 0, 99 -> 1
-      startColor = neutral;
-      endColor = maxRed;
-    }
+    factor = (clampedValue - 50) / 49; // 51 -> ~0.02, 99 -> 1
+    startColor = neutral;
+    endColor = maxBlue;
   }
 
   return interpolateHexColors(startColor, endColor, factor);

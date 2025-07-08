@@ -6,49 +6,49 @@ import React, {
 } from "react";
 
 // Define the shape of the stats context
-type StatContextType = {
+export type StatContextType = {
   war: {
     stat: number;
     setStat: React.Dispatch<React.SetStateAction<number>>;
   };
   otherStats: {
-    evo: {
+    "EV Offense": {
       stat: number;
       setStat: React.Dispatch<React.SetStateAction<number>>;
     };
-    evd: {
+    "EV Defense": {
       stat: number;
       setStat: React.Dispatch<React.SetStateAction<number>>;
     };
-    pp: {
+    PP: {
       stat: number;
       setStat: React.Dispatch<React.SetStateAction<number>>;
     };
-    pk: {
+    PK: {
       stat: number;
       setStat: React.Dispatch<React.SetStateAction<number>>;
     };
-    fin: {
+    Finishing: {
       stat: number;
       setStat: React.Dispatch<React.SetStateAction<number>>;
     };
-    goal: {
+    Goals: {
       stat: number;
       setStat: React.Dispatch<React.SetStateAction<number>>;
     };
-    fas: {
+    "1st Assists": {
       stat: number;
       setStat: React.Dispatch<React.SetStateAction<number>>;
     };
-    pen: {
+    Penalties: {
       stat: number;
       setStat: React.Dispatch<React.SetStateAction<number>>;
     };
-    comp: {
+    Competition: {
       stat: number;
       setStat: React.Dispatch<React.SetStateAction<number>>;
     };
-    team: {
+    Teammates: {
       stat: number;
       setStat: React.Dispatch<React.SetStateAction<number>>;
     };
@@ -75,16 +75,16 @@ export const StatProvider = ({ children }: { children: ReactNode }) => {
       value={{
         war: { stat: warstatValue, setStat: setWARStatValue },
         otherStats: {
-          evo: { stat: evostatValue, setStat: setEVOstatValue },
-          evd: { stat: evdstatValue, setStat: setEVDstatValue },
-          pp: { stat: ppstatValue, setStat: setPPstatValue },
-          pk: { stat: pkstatValue, setStat: setPKStatValue },
-          fin: { stat: finstatValue, setStat: setFINStatValue },
-          goal: { stat: goalstatValue, setStat: setGOALStatValue },
-          fas: { stat: fasstatValue, setStat: setFASStatValue },
-          pen: { stat: penstatValue, setStat: setPENStatValue },
-          comp: { stat: compstatValue, setStat: setCOMPStatValue },
-          team: { stat: teamstatValue, setStat: setTEAMStatValue },
+          "EV Offense": { stat: evostatValue, setStat: setEVOstatValue },
+          "EV Defense": { stat: evdstatValue, setStat: setEVDstatValue },
+          PP: { stat: ppstatValue, setStat: setPPstatValue },
+          PK: { stat: pkstatValue, setStat: setPKStatValue },
+          Finishing: { stat: finstatValue, setStat: setFINStatValue },
+          Goals: { stat: goalstatValue, setStat: setGOALStatValue },
+          "1st Assists": { stat: fasstatValue, setStat: setFASStatValue },
+          Penalties: { stat: penstatValue, setStat: setPENStatValue },
+          Competition: { stat: compstatValue, setStat: setCOMPStatValue },
+          Teammates: { stat: teamstatValue, setStat: setTEAMStatValue },
         },
       }}
     >
