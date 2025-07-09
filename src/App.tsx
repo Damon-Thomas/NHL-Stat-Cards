@@ -11,6 +11,7 @@ import { getProxiedImageUrl } from "./utils/imageProxy";
 import "./App.css";
 import { getTeamColors } from "./data/colors";
 import StatBox from "./components/StatBox";
+import LineGraph from "./components/LineGraph";
 
 function App() {
   const [teams, setTeams] = useState<Team[]>([]);
@@ -26,6 +27,8 @@ function App() {
   const playerDropdownRef = useRef<HTMLDivElement>(null);
   const playerCardRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [graphWidth, setGraphWidth] = useState(400); // default width
+  const graphContainerRef = useRef<HTMLDivElement>(null);
 
   // Get the local logo path for the selected team
   const selectedTeamLogoUrl = getTeamLogoPath(selectedTeam?.teamAbbrev.default);
@@ -46,6 +49,20 @@ function App() {
   useEffect(() => {
     fetchTeams();
     getCount();
+  }, []);
+
+  // Update graph width when container size changes
+  useEffect(() => {
+    const updateWidth = () => {
+      if (graphContainerRef.current) {
+        const containerWidth = graphContainerRef.current.offsetWidth;
+        setGraphWidth(containerWidth - 32); // Subtract padding (p-4 = 16px on each side)
+      }
+    };
+
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
   }, []);
 
   // Handle clicks outside dropdown
@@ -413,7 +430,23 @@ function App() {
             ))}
           </div>
         </div>
-        <div className="bg-purple-400 p-4 flex items-center justify-center min-w-0 overflow-hidden"></div>
+        <div
+          ref={graphContainerRef}
+          className="flex flex-col p-4  items-center justify-center min-w-0 overflow-hidden"
+        >
+          <p>WAR Percentile Rank</p>
+          <div className="w-full">
+            <LineGraph width={graphWidth} showAll={false}></LineGraph>
+          </div>
+          <p>
+            <span className="text-[#273044]">Offense</span> vs{" "}
+            <span className="text-[#E34C5B]">Defense</span> vs{" "}
+            <span className="text-[#5DB4F9]">Finishing</span>
+          </p>
+          <div className="w-full">
+            <LineGraph width={graphWidth}></LineGraph>
+          </div>
+        </div>
       </div>
     );
   };
