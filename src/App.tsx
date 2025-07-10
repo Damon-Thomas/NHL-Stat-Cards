@@ -540,14 +540,27 @@ function AppContent() {
       <div className="pt-24 px-1 sm:px-4 w-full flex justify-center">
         <PlayerCard />
       </div>
+      {/* Background for hidden card */}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: 1152,
+          height: 626.398,
+          backgroundColor: "#242424",
+          zIndex: -98,
+          pointerEvents: "none",
+        }}
+      />
       <div
         id="hidden-card"
         style={{
-          // position: "fixed",
-          // top: 0,
-          // left: 0,
-          opacity: 0,
-          zIndex: -1,
+          position: "fixed",
+          top: 0,
+          left: 0,
+          opacity: 1,
+          zIndex: -99,
           pointerEvents: "none",
           width: 1152,
           height: 626.398,
