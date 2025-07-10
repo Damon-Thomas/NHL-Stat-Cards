@@ -11,9 +11,11 @@ type StatObject = {
 export default function StatBox({
   statName,
   large = false,
+  editable = true,
 }: {
   statName?: string;
   large?: boolean;
+  editable?: boolean;
 }) {
   const { war, otherStats } = useStatContext();
   const [expandedStats, setExpandedStats] = useState<
@@ -80,19 +82,33 @@ export default function StatBox({
     statObj?.stat === 0 ? "NA" : statObj?.stat.toString() || "";
 
   const numberClasses = large
-    ? " text-xl sm:text-3xl md:text-6xl h-full"
-    : "text-xs sm:text-base md:text-4xl ";
+    ? editable
+      ? " text-xl sm:text-3xl md:text-6xl h-full"
+      : " text-6xl h-full"
+    : editable
+    ? "text-xs sm:text-base md:text-4xl "
+    : "text-4xl ";
 
   const titleClasses = large
-    ? "text-xs sm:text-lg md:text-xl h-full"
-    : "text-xs sm:text-base md:text-xl ";
+    ? editable
+      ? "text-xs sm:text-lg md:text-xl h-full"
+      : "text-xl h-full"
+    : editable
+    ? "text-xs sm:text-base md:text-xl "
+    : "text-xl ";
 
-  const baseClasses = large ? "flex-1" : "py-2 sm:py-4 md:py-6 w-full";
+  const baseClasses = large
+    ? "flex-1"
+    : editable
+    ? "py-2 sm:py-4 md:py-6 w-full"
+    : "py-6 w-full";
 
   return (
     <div className={`flex flex-col min-w-0 max-w-full ${titleClasses}`}>
       <p
-        className={`text-nowrap text-[8px] sm:text-lg md:text-xl overflow-hidden tracking-tighter`}
+        className={`text-nowrap overflow-hidden tracking-tighter ${
+          editable ? "text-[8px] sm:text-lg md:text-xl" : "text-xl"
+        }`}
       >
         {statObj?.statLabel}
       </p>
@@ -100,38 +116,58 @@ export default function StatBox({
         className={`flex justify-center items-center mt-2 gap-0 max-w-full ${baseClasses} relative`}
         style={{ backgroundColor }}
       >
-        <input
-          type="text"
-          maxLength={2}
-          pattern="[0-9]*"
-          inputMode="numeric"
-          className={`bg-transparent text-center border-none outline-none font-black ${numberClasses} ${
-            displayValue === "NA" ? "text-transparent" : ""
-          }`}
-          style={{
-            appearance: "textfield",
-            MozAppearance: "textfield",
-            WebkitAppearance: "none",
-            width: "2ch",
-            minWidth: "2ch",
-            maxWidth: "100%",
-          }}
-          value={displayValue === "NA" ? "0" : displayValue}
-          onChange={handleChange}
-          onBlur={(e) => handleBlur(e.target.value)}
-        />
-        {displayValue !== "NA" && (
-          <p className={`h-full flex items-center font-bold ${numberClasses}`}>
-            %
-          </p>
-        )}
-        {/* NA overlay when value is 0 */}
-        {displayValue === "NA" && (
+        {editable ? (
+          <>
+            <input
+              type="text"
+              maxLength={2}
+              pattern="[0-9]*"
+              inputMode="numeric"
+              className={`bg-transparent text-center border-none outline-none font-black ${numberClasses} ${
+                displayValue === "NA" ? "text-transparent" : ""
+              }`}
+              style={{
+                appearance: "textfield",
+                MozAppearance: "textfield",
+                WebkitAppearance: "none",
+                width: "2ch",
+                minWidth: "2ch",
+                maxWidth: "100%",
+              }}
+              value={displayValue === "NA" ? "0" : displayValue}
+              onChange={handleChange}
+              onBlur={(e) => handleBlur(e.target.value)}
+            />
+            {displayValue !== "NA" && (
+              <p
+                className={`h-full flex items-center font-bold ${numberClasses}`}
+              >
+                %
+              </p>
+            )}
+            {/* NA overlay when value is 0 */}
+            {displayValue === "NA" && (
+              <div
+                className={`absolute inset-0 flex justify-center items-center font-black ${numberClasses} pointer-events-none cursor-text group`}
+              >
+                <span>NA</span>
+                <span className="ml-1 opacity-0 group-hover:opacity-100 group-hover:animate-pulse border-r-2 border-current h-6"></span>
+              </div>
+            )}
+          </>
+        ) : (
+          // Non-editable version - just display the value
           <div
-            className={`absolute inset-0 flex justify-center items-center font-black ${numberClasses} pointer-events-none cursor-text group`}
+            className={`flex justify-center items-center font-black ${numberClasses}`}
           >
-            <span>NA</span>
-            <span className="ml-1 opacity-0 group-hover:opacity-100 group-hover:animate-pulse border-r-2 border-current h-6"></span>
+            {displayValue === "NA" ? (
+              <span>NA</span>
+            ) : (
+              <>
+                <span>{displayValue}</span>
+                <span>%</span>
+              </>
+            )}
           </div>
         )}
       </div>

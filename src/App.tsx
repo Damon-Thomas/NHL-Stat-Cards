@@ -12,20 +12,34 @@ import "./App.css";
 import { getTeamColors } from "./data/colors";
 import StatBox from "./components/StatBox";
 import LineGraph from "./components/LineGraph";
+import { StatProvider } from "./contexts/statContext";
+import { GraphProvider } from "./contexts/graphContext";
+import { PlayerProvider, usePlayerContext } from "./contexts/playerContext";
 
 function App() {
+  return (
+    <PlayerProvider>
+      <StatProvider>
+        <GraphProvider>
+          <AppContent />
+        </GraphProvider>
+      </StatProvider>
+    </PlayerProvider>
+  );
+}
+
+function AppContent() {
+  const { selectedPlayer, setSelectedPlayer, selectedTeam, setSelectedTeam } =
+    usePlayerContext();
   const [teams, setTeams] = useState<Team[]>([]);
-  const [selectedTeam, setSelectedTeam] = useState<Team | null>();
   const [roster, setRoster] = useState<Player[]>([]);
   const [loading, setLoading] = useState(false);
   const [cardCount, setCardCount] = useState<number>(0);
-  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isPlayerDropdownOpen, setIsPlayerDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const playerDropdownRef = useRef<HTMLDivElement>(null);
-  const playerCardRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Get the local logo path for the selected team
@@ -201,7 +215,7 @@ function App() {
     }
   };
 
-  const PlayerCard = () => {
+  const PlayerCard = ({ fixed = false }: { fixed?: boolean }) => {
     function formatAge(age: string | undefined): number {
       if (!age) return 0; // Handle undefined or null age
       return new Date().getFullYear() - new Date(age).getFullYear();
@@ -251,15 +265,31 @@ function App() {
 
     return (
       <div
-        ref={playerCardRef}
-        className="w-full max-w-6xl bg-white text-black rounded-xl p-2 sm:p-4 grid gap-2 overflow-hidden"
-        style={{ gridTemplateColumns: "3fr 2fr" }}
+        className={`bg-white text-black rounded-xl grid gap-2 overflow-hidden ${
+          fixed ? "w-[1152px] p-4" : "w-full max-w-6xl p-2 sm:p-4"
+        }`}
+        style={{
+          gridTemplateColumns: "3fr 2fr",
+          ...(fixed && { height: "626.398px" }),
+        }}
       >
-        <div className="min-w-0 overflow-hidden pt-2 flex flex-col sm:gap-2 md:gap-4">
-          <div className="h-8 sm:h-12 md:h-16 lg:h-18 w-full mb-1 rounded flex items-center gap-2">
+        <div
+          className={`min-w-0 overflow-hidden pt-2 flex flex-col ${
+            fixed ? "gap-4" : "sm:gap-2 md:gap-4"
+          }`}
+        >
+          <div
+            className={`w-full mb-1 rounded flex items-center gap-2 ${
+              fixed ? "h-16" : "h-8 sm:h-12 md:h-16 lg:h-18"
+            }`}
+          >
             {/* Logo container with fixed size */}
             <div
-              className="w-8 sm:w-12 md:w-16 lg:w-18 h-8 sm:h-12 md:h-16 lg:h-18 flex-shrink-0 rounded flex items-center justify-center relative"
+              className={`flex-shrink-0 rounded flex items-center justify-center relative ${
+                fixed
+                  ? "w-16 h-16"
+                  : "w-8 sm:w-12 md:w-16 lg:w-18 h-8 sm:h-12 md:h-16 lg:h-18"
+              }`}
               ref={dropdownRef}
             >
               <button
@@ -272,7 +302,11 @@ function App() {
                   alt={
                     selectedTeam ? selectedTeam.teamName.default : "NHL Logo"
                   }
-                  className="w-8 sm:w-12 md:w-16 lg:w-18 h-8 sm:h-12 md:h-16 lg:h-18 object-contain"
+                  className={
+                    fixed
+                      ? "w-16 h-16 object-contain"
+                      : "w-8 sm:w-12 md:w-16 lg:w-18 h-8 sm:h-12 md:h-16 lg:h-18 object-contain"
+                  }
                 />
               </button>
 
@@ -307,10 +341,16 @@ function App() {
             </div>
 
             {/* Player name container with constrained space */}
-            <div className="h-8 sm:h-12 md:h-16 lg:h-18 flex flex-1 flex-col items-start min-w-0">
+            <div
+              className={`flex flex-1 flex-col items-start min-w-0 ${
+                fixed ? "h-16" : "h-8 sm:h-12 md:h-16 lg:h-18"
+              }`}
+            >
               {/* Player Dropdown */}
               <div
-                className="w-full h-8 sm:h-12 md:h-16 lg:h-18 flex flex-col relative"
+                className={`w-full flex flex-col relative ${
+                  fixed ? "h-16" : "h-8 sm:h-12 md:h-16 lg:h-18"
+                }`}
                 ref={playerDropdownRef}
               >
                 <button
@@ -318,14 +358,20 @@ function App() {
                   className="w-full flex-1 text-left flex items-center bg-transparent border-none outline-none p-0 m-0"
                   disabled={loading || !selectedTeam}
                 >
-                  <p className="text-xs w-full sm:text-xl md:text-2xl lg:text-3xl mb-1 ml-1 font-black italic tracking-wider whitespace-nowrap overflow-hidden text-ellipsis">
+                  <p
+                    className={`w-full mb-1 ml-1 font-black italic tracking-wider whitespace-nowrap overflow-hidden text-ellipsis ${
+                      fixed
+                        ? "text-3xl"
+                        : "text-xs sm:text-xl md:text-2xl lg:text-3xl"
+                    }`}
+                  >
                     {selectedPlayer
                       ? `${selectedPlayer?.firstName.default.toUpperCase()} ${selectedPlayer?.lastName.default.toUpperCase()}`
                       : "PLAYER NAME"}
                   </p>
                 </button>
                 <div
-                  className="h-1.5 sm:h-2 lg:h-3"
+                  className={fixed ? "h-3" : "h-1.5 sm:h-2 lg:h-3"}
                   style={{
                     background: teamColorScheme.primary,
                     clipPath: "polygon(4px 0, 100% 0, 100% 100%, 0 100%)",
@@ -361,7 +407,9 @@ function App() {
             </div>
           </div>
           <div
-            className="h-auto w-full mb-2 grid gap-2 sm:gap-4 md:gap-6"
+            className={`h-auto w-full mb-2 grid ${
+              fixed ? "gap-6" : "gap-2 sm:gap-4 md:gap-6"
+            }`}
             style={{ gridTemplateColumns: "1fr 1fr 1fr" }}
           >
             <div className="min-w-0">
@@ -379,28 +427,48 @@ function App() {
                 className="w-full h-auto object-contain"
               />
             </div>
-            <StatBox large={true}></StatBox>
+            <StatBox large={true} editable={!fixed}></StatBox>
 
-            <div className="grid grid-rows-4 text-xs sm:text-base md:text-2xl min-w-0">
-              <div className="flex items-center justify-center gap-2 sm:gap-4">
+            <div
+              className={`grid grid-rows-4 min-w-0 ${
+                fixed ? "text-2xl" : "text-xs sm:text-base md:text-2xl"
+              }`}
+            >
+              <div
+                className={`flex items-center justify-center ${
+                  fixed ? "gap-4" : "gap-2 sm:gap-4"
+                }`}
+              >
                 <p className="flex- ">Pos:</p>
                 <p className="flex-1 font-black text-left">
                   {formatPosition(selectedPlayer?.positionCode)}
                 </p>
               </div>
-              <div className="flex items-center gap-2 sm:gap-4">
+              <div
+                className={`flex items-center ${
+                  fixed ? "gap-4" : "gap-2 sm:gap-4"
+                }`}
+              >
                 <p className="flex-2 ">Age:</p>
                 <p className="flex-1 font-black text-left">
                   {formatAge(selectedPlayer?.birthDate)}
                 </p>
               </div>
-              <div className="flex items-center gap-2 sm:gap-4">
+              <div
+                className={`flex items-center ${
+                  fixed ? "gap-4" : "gap-2 sm:gap-4"
+                }`}
+              >
                 <p className="flex-2">Hnd:</p>
                 <p className="flex-1 font-black text-left">
                   {formatHandedness(selectedPlayer?.shootsCatches)}
                 </p>
               </div>
-              <div className="flex items-center gap-2 sm:gap-6">
+              <div
+                className={`flex items-center ${
+                  fixed ? "gap-6" : "gap-2 sm:gap-6"
+                }`}
+              >
                 <p className="flex-2">Hgt:</p>
                 <p className="flex-1 font-black text-left">
                   {inchesToFeet(selectedPlayer?.heightInInches)}
@@ -408,15 +476,32 @@ function App() {
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-5 grid-rows-2 gap-1 sm:gap-2 md:gap-6 w-full min-w-0">
+          <div
+            className={`grid grid-cols-5 grid-rows-2 w-full min-w-0 ${
+              fixed ? "gap-6" : "gap-1 sm:gap-2 md:gap-6"
+            }`}
+          >
             {otherStats.map((stat, index) => (
-              <StatBox key={index} statName={stat} large={false} />
+              <StatBox
+                key={index}
+                statName={stat}
+                editable={!fixed}
+                large={false}
+              />
             ))}
           </div>
         </div>
-        <div className="flex flex-col items-center justify-around pl-2 sm:pl-4 w-full h-full">
+        <div
+          className={`flex flex-col items-center justify-around w-full h-full ${
+            fixed ? "pl-4" : "pl-2 sm:pl-4"
+          }`}
+        >
           <div className="flex flex-col w-full">
-            <p className="font-black text-xs sm:text-xl md:text-2xl ">
+            <p
+              className={`font-black mt-4 ${
+                fixed ? "text-2xl" : "text-xs sm:text-xl md:text-2xl"
+              }`}
+            >
               WAR Percentile Rank
             </p>
             <div className="w-full" style={{ minHeight: 0 }}>
@@ -424,7 +509,11 @@ function App() {
             </div>
           </div>
           <div className="flex flex-col w-full">
-            <p className="font-black text-xs sm:text-xl md:text-2xl mt-4">
+            <p
+              className={`font-black mt-4 ${
+                fixed ? "text-2xl" : "text-xs sm:text-xl md:text-2xl"
+              }`}
+            >
               <span className="text-[#273044]">Offense</span> vs{" "}
               <span className="text-[#E34C5B]">Defense</span> vs{" "}
               <span className="text-[#5DB4F9]">Finishing</span>
@@ -443,7 +532,6 @@ function App() {
       <div className="fixed top-0 left-0 h-20 w-full p-2 bg-white text-black shadow-lg z-10 flex justify-around items-center">
         <CardCount count={cardCount} />
         <DownloadButton
-          elementRef={playerCardRef}
           selectedPlayer={selectedPlayer}
           selectedTeam={selectedTeam || null}
           className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
@@ -455,50 +543,20 @@ function App() {
       <div
         id="hidden-card"
         style={{
-          position: "absolute",
-          top: "-9999px",
-          left: "-9999px",
-          width: "800px",
-          height: "450px",
-          overflow: "hidden",
+          // position: "fixed",
+          // top: 0,
+          // left: 0,
+          opacity: 0,
+          zIndex: -1,
           pointerEvents: "none",
+          width: 1152,
+          height: 626.398,
         }}
       >
-        <PlayerCard />
-      </div>{" "}
+        <PlayerCard fixed={true} />
+      </div>
     </div>
   );
-}
-
-// KEEP
-// implement a hidden statcar later for consistently sized and high quality pngs
-{
-  /* <StatCard
-  name={userName}
-  team={userTeam}
-  stats={userStats}
-  playerImage={userImage}
-/>
-
-<div
-  id="hidden-card"
-  style={{
-    position: 'absolute',
-    top: '-9999px',
-    left: '-9999px',
-    width: '800px',
-    height: '450px',
-    overflow: 'hidden',
-    pointerEvents: 'none',
-  }}
->
-  <StatCard
-    name={userName}
-    team={userTeam}
-    stats={userStats}
-    playerImage={userImage}
-  />
-</div> */
 }
 
 export default App;

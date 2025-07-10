@@ -1,4 +1,10 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  type ReactNode,
+} from "react";
 
 type GraphContextType = {
   single: {
@@ -47,7 +53,7 @@ export const GraphProvider = ({ children }: { children: ReactNode }) => {
     xPoints.map((x, i) => ({ x, y: [0.3, 0.6, 0.5][i] }))
   );
 
-  const updateXPoints = (innerWidth: number) => {
+  const updateXPoints = useCallback((innerWidth: number) => {
     const newXPoints = [
       Math.floor(innerWidth * 0.125),
       Math.floor(innerWidth * 0.5),
@@ -66,7 +72,7 @@ export const GraphProvider = ({ children }: { children: ReactNode }) => {
     setThirdSet((prev) =>
       prev.map((point, i) => ({ ...point, x: newXPoints[i] }))
     );
-  };
+  }, []);
 
   return (
     <GraphContext.Provider

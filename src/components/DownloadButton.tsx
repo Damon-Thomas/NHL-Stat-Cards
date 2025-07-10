@@ -3,7 +3,6 @@ import { domToPng } from "modern-screenshot";
 import type { Team, Player } from "../types";
 
 interface DownloadButtonProps {
-  elementRef: React.RefObject<HTMLElement | null>;
   selectedPlayer: Player | null;
   selectedTeam: Team | null;
   className?: string;
@@ -11,7 +10,6 @@ interface DownloadButtonProps {
 }
 
 export default function DownloadButton({
-  elementRef,
   selectedPlayer,
   selectedTeam,
   className = "",
@@ -20,8 +18,10 @@ export default function DownloadButton({
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handleDownload = async () => {
-    if (!elementRef.current) {
-      console.error("Element reference is null");
+    // Use the hidden card element instead of the visible one
+    const hiddenCard = document.getElementById("hidden-card");
+    if (!hiddenCard) {
+      console.error("Hidden card element not found");
       return;
     }
 
@@ -29,15 +29,13 @@ export default function DownloadButton({
     try {
       console.log("Starting ultra-high-quality PNG generation...");
 
-      // Get the original dimensions
-      const rect = elementRef.current.getBoundingClientRect();
-      console.log("Original dimensions:", rect.width, "x", rect.height);
-
-      // Generate at very high resolution for crisp quality
-      const dataUrl = await domToPng(elementRef.current, {
+      // Generate at very high resolution for crisp quality with fixed dimensions
+      const dataUrl = await domToPng(hiddenCard, {
         quality: 1.0,
         backgroundColor: "#ffffff",
-        scale: 6, // Very high scale for maximum quality
+        scale: 2, // High scale for maximum quality
+        width: 1152,
+        height: 626.398,
         style: {
           transform: "scale(1)",
           transformOrigin: "top left",
