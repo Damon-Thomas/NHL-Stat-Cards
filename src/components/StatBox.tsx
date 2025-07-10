@@ -91,7 +91,9 @@ export default function StatBox({
 
   return (
     <div className={`flex flex-col min-w-0 max-w-full ${titleClasses}`}>
-      <p className={`text-nowrap overflow-hidden tracking-tighter`}>
+      <p
+        className={`text-nowrap text-[8px] sm:text-lg md:text-xl overflow-hidden tracking-tighter`}
+      >
         {statObj?.statLabel}
       </p>
       <div

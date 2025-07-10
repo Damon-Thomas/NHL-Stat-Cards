@@ -18,7 +18,7 @@ const YEAR_LABELS = [
   ).padStart(2, "0")}`,
 ];
 
-const MARGIN = { top: 10, right: 40, bottom: 40, left: 60 };
+const MARGIN = { top: 20, right: 40, bottom: 40, left: 60 };
 
 function LineGraph({
   showAll = true,

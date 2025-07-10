@@ -252,7 +252,7 @@ function App() {
     return (
       <div
         ref={playerCardRef}
-        className="w-full max-w-6xl min-h-[400px] bg-white text-black rounded-xl p-2 sm:p-4 grid gap-2 overflow-hidden"
+        className="w-full max-w-6xl bg-white text-black rounded-xl p-2 sm:p-4 grid gap-2 overflow-hidden"
         style={{ gridTemplateColumns: "3fr 2fr" }}
       >
         <div className="min-w-0 overflow-hidden pt-2 flex flex-col sm:gap-2 md:gap-4">
@@ -414,20 +414,24 @@ function App() {
             ))}
           </div>
         </div>
-        <div className="flex flex-col items-center justify-center px-4 w-full h-full">
-          <p className="font-black text-sm sm:text-xl md:text-2xl ">
-            WAR Percentile Rank
-          </p>
-          <div className="w-full" style={{ minHeight: 0 }}>
-            <LineGraph showAll={false} />
+        <div className="flex flex-col items-center justify-around pl-2 sm:pl-4 w-full h-full">
+          <div className="flex flex-col w-full">
+            <p className="font-black text-xs sm:text-xl md:text-2xl ">
+              WAR Percentile Rank
+            </p>
+            <div className="w-full" style={{ minHeight: 0 }}>
+              <LineGraph showAll={false} />
+            </div>
           </div>
-          <p className="font-black text-sm sm:text-xl md:text-2xl mt-4">
-            <span className="text-[#273044]">Offense</span> vs{" "}
-            <span className="text-[#E34C5B]">Defense</span> vs{" "}
-            <span className="text-[#5DB4F9]">Finishing</span>
-          </p>
-          <div className="w-full" style={{ minHeight: 0 }}>
-            <LineGraph showAll={true} />
+          <div className="flex flex-col w-full">
+            <p className="font-black text-xs sm:text-xl md:text-2xl mt-4">
+              <span className="text-[#273044]">Offense</span> vs{" "}
+              <span className="text-[#E34C5B]">Defense</span> vs{" "}
+              <span className="text-[#5DB4F9]">Finishing</span>
+            </p>
+            <div className="w-full" style={{ minHeight: 0 }}>
+              <LineGraph showAll={true} />
+            </div>
           </div>
         </div>
       </div>
@@ -448,6 +452,20 @@ function App() {
       <div className="pt-24 px-1 sm:px-4 w-full flex justify-center">
         <PlayerCard />
       </div>
+      <div
+        id="hidden-card"
+        style={{
+          position: "absolute",
+          top: "-9999px",
+          left: "-9999px",
+          width: "800px",
+          height: "450px",
+          overflow: "hidden",
+          pointerEvents: "none",
+        }}
+      >
+        <PlayerCard />
+      </div>{" "}
     </div>
   );
 }
