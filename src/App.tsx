@@ -147,9 +147,11 @@ function AppContent() {
   };
 
   const handleTeamSelect = (teamId: string) => {
+    console.log("Selected team ID:", teamId);
     const currentTeam = teams.find(
       (team) => team.teamAbbrev.default === teamId
     );
+    console.log("Selected team:", currentTeam);
     if (!currentTeam) {
       console.error("Selected team not found in teams list");
       setRoster([]);
@@ -166,7 +168,13 @@ function AppContent() {
   };
 
   const handleDropdownTeamSelect = (team: Team | null) => {
+    console.log("handleDropdownTeamSelect called with:", team);
+    console.log(
+      "Team object structure:",
+      team ? JSON.stringify(team, null, 2) : "null"
+    );
     if (team) {
+      console.log("Team abbrev:", team.teamAbbrev?.default);
       handleTeamSelect(team.teamAbbrev.default);
     } else {
       setSelectedTeam(null);
@@ -290,7 +298,7 @@ function AppContent() {
                   ? "w-16 h-16"
                   : "w-8 sm:w-12 md:w-16 lg:w-18 h-8 sm:h-12 md:h-16 lg:h-18"
               }`}
-              ref={dropdownRef}
+              ref={fixed ? null : dropdownRef}
             >
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -351,7 +359,7 @@ function AppContent() {
                 className={`w-full flex flex-col relative ${
                   fixed ? "h-16" : "h-8 sm:h-12 md:h-16 lg:h-18"
                 }`}
-                ref={playerDropdownRef}
+                ref={fixed ? null : playerDropdownRef}
               >
                 <button
                   onClick={() => setIsPlayerDropdownOpen(!isPlayerDropdownOpen)}
