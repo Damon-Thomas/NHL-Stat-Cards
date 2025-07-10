@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect } from "react";
+import { useGraph } from "../contexts/graphContext";
 
 const POINT_RADIUS = 10;
 const AXIS_LABELS = ["0%", "25%", "50%", "75%", "100%"];
@@ -28,23 +29,36 @@ function LineGraph({
   width?: number;
   height?: number;
 }) {
+  const graphContext = useGraph();
+
+  if (!graphContext) {
+    throw new Error("LineGraph must be used within a GraphProvider");
+  }
+
+  const { single, multiple, updateXPoints } = graphContext;
+
+  // Use single or multiple datasets based on showAll prop
+  const mainSet = showAll ? multiple.mainSet : single.singleSet;
+  const setMainSet = showAll ? multiple.setMainSet : single.setSingleSet;
+  const secondSet = showAll ? multiple.secondSet : multiple.secondSet;
+  const setSecondSet = showAll ? multiple.setSecondSet : multiple.setSecondSet;
+  const thirdSet = showAll ? multiple.thirdSet : multiple.thirdSet;
+  const setThirdSet = showAll ? multiple.setThirdSet : multiple.setThirdSet;
+
   const innerWidth = width - MARGIN.left - MARGIN.right;
   const innerHeight = height - MARGIN.top - MARGIN.bottom;
   const fontSize = Math.max(12, width * 0.04); // 2% of width, min 10px
+
+  // Update x-coordinates when dimensions change
+  useEffect(() => {
+    updateXPoints(innerWidth);
+  }, [innerWidth, updateXPoints]);
 
   const xPoints = [
     Math.floor(innerWidth * 0.125),
     Math.floor(innerWidth * 0.5),
     Math.floor(innerWidth * 0.875),
   ];
-
-  const [mainSet, setMainSet] = useState(xPoints.map((x) => ({ x, y: 0.5 })));
-  const [secondSet, setSecondSet] = useState(
-    xPoints.map((x, i) => ({ x, y: [0.6, 0.4, 0.7][i] }))
-  );
-  const [thirdSet, setThirdSet] = useState(
-    xPoints.map((x, i) => ({ x, y: [0.3, 0.6, 0.5][i] }))
-  );
 
   const scaleY = (val: number) => innerHeight * val;
 

@@ -21,6 +21,7 @@ type GraphContextType = {
       React.SetStateAction<{ x: number; y: number }[]>
     >;
   };
+  updateXPoints: (innerWidth: number) => void;
 };
 
 export const GraphContext = createContext<GraphContextType | undefined>(
@@ -28,10 +29,12 @@ export const GraphContext = createContext<GraphContextType | undefined>(
 );
 
 export const GraphProvider = ({ children }: { children: ReactNode }) => {
+  // Default width for initial setup - will be updated by LineGraph component
+  const defaultInnerWidth = 500;
   const xPoints = [
-    Math.floor(innerWidth * 0.125),
-    Math.floor(innerWidth * 0.5),
-    Math.floor(innerWidth * 0.875),
+    Math.floor(defaultInnerWidth * 0.125),
+    Math.floor(defaultInnerWidth * 0.5),
+    Math.floor(defaultInnerWidth * 0.875),
   ];
   const [singleSet, setSingleSet] = useState(
     xPoints.map((x) => ({ x, y: 0.5 }))
@@ -43,6 +46,28 @@ export const GraphProvider = ({ children }: { children: ReactNode }) => {
   const [thirdSet, setThirdSet] = useState(
     xPoints.map((x, i) => ({ x, y: [0.3, 0.6, 0.5][i] }))
   );
+
+  const updateXPoints = (innerWidth: number) => {
+    const newXPoints = [
+      Math.floor(innerWidth * 0.125),
+      Math.floor(innerWidth * 0.5),
+      Math.floor(innerWidth * 0.875),
+    ];
+
+    setSingleSet((prev) =>
+      prev.map((point, i) => ({ ...point, x: newXPoints[i] }))
+    );
+    setMainSet((prev) =>
+      prev.map((point, i) => ({ ...point, x: newXPoints[i] }))
+    );
+    setSecondSet((prev) =>
+      prev.map((point, i) => ({ ...point, x: newXPoints[i] }))
+    );
+    setThirdSet((prev) =>
+      prev.map((point, i) => ({ ...point, x: newXPoints[i] }))
+    );
+  };
+
   return (
     <GraphContext.Provider
       value={{
@@ -55,6 +80,7 @@ export const GraphProvider = ({ children }: { children: ReactNode }) => {
           thirdSet,
           setThirdSet,
         },
+        updateXPoints,
       }}
     >
       {children}
