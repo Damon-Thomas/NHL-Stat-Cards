@@ -127,6 +127,44 @@ function LineGraph({
     window.addEventListener("mouseup", onUp);
   };
 
+  const handleTouchDrag = (
+    setPoints: Function,
+    index: number,
+    initialYRatio: number,
+    e: React.TouchEvent<SVGCircleElement>
+  ) => {
+    e.preventDefault();
+    const svg = e.currentTarget.ownerSVGElement;
+    if (!svg) return;
+
+    const rect = svg.getBoundingClientRect();
+    const touch = e.touches[0];
+
+    const startY = touch.clientY - rect.top - MARGIN.top;
+    const offset = startY - innerHeight * initialYRatio;
+
+    const onTouchMove = (moveEvent: TouchEvent) => {
+      if (moveEvent.touches.length === 0) return;
+      const newTouch = moveEvent.touches[0];
+      const newY = newTouch.clientY - rect.top - MARGIN.top - offset;
+      const ratioY = Math.max(0, Math.min(1, newY / innerHeight));
+
+      setPoints((prev: any[]) => {
+        const updated = [...prev];
+        updated[index] = { ...updated[index], y: ratioY };
+        return updated;
+      });
+    };
+
+    const onTouchEnd = () => {
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
+    };
+
+    window.addEventListener("touchmove", onTouchMove);
+    window.addEventListener("touchend", onTouchEnd);
+  };
+
   const renderLine = (
     points: { x: number; y: number }[],
     color: string,
@@ -157,6 +195,7 @@ function LineGraph({
         fill={color}
         cursor="pointer"
         onMouseDown={(e) => handleDrag(setPoints, i, p.y, e)}
+        onTouchStart={(e) => handleTouchDrag(setPoints, i, p.y, e)}
       />
     ));
 
