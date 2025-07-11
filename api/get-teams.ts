@@ -1,7 +1,19 @@
 // api/get-teams.ts
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import { securityMiddleware } from "./utils/security.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Apply security middleware
+  const securityResult = await securityMiddleware(req, res, {
+    allowedMethods: ["GET"],
+    rateLimit: "GET",
+    requireOriginCheck: false,
+  });
+
+  if (!securityResult.allowed) {
+    return; // Security middleware already sent response
+  }
+
   try {
     const response = await fetch("https://api-web.nhle.com/v1/standings/now");
     if (!response.ok) {
@@ -21,6 +33,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(200).json(data);
   } catch (err: any) {
     console.error("Error fetching NHL teams:", err.message);
-    res.status(500).json({ error: "Failed to fetch NHL teams" });
+    res.status(500).json({
+      error: "Failed to fetch NHL teams",
+      timestamp: new Date().toISOString(),
+    });
   }
 }

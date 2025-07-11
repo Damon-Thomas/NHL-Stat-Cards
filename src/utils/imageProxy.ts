@@ -20,9 +20,10 @@ export function getProxiedImageUrl(originalUrl: string | undefined): string {
     return `/api/image-proxy?url=${encodeURIComponent(originalUrl)}`;
   }
 
-  // For other external URLs, also use the proxy
+  // For security, only proxy NHL assets - reject other external URLs
   if (originalUrl.startsWith("http://") || originalUrl.startsWith("https://")) {
-    return `/api/image-proxy?url=${encodeURIComponent(originalUrl)}`;
+    console.warn("Refusing to proxy non-NHL URL for security:", originalUrl);
+    return "/default-skater.png";
   }
 
   // Fallback to original URL if it doesn't match any pattern
