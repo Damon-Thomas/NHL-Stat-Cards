@@ -177,6 +177,12 @@ export default function PlayerCard({ fixed = false }: PlayerCardProps) {
   };
 
   const handleTeamSelect = (teamId: string) => {
+    // Ensure teams is available before trying to find
+    if (!teams || teams.length === 0) {
+      console.warn("Teams not loaded yet");
+      return;
+    }
+    
     const currentTeam = teams.find(
       (team) => team.teamAbbrev.default === teamId
     );
@@ -287,7 +293,7 @@ export default function PlayerCard({ fixed = false }: PlayerCardProps) {
             </button>
 
             {/* Dropdown Menu */}
-            {isDropdownOpen && (
+            {isDropdownOpen && !fixed && (
               <div className="absolute top-full left-0 mt-1 w-80 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
                 {/* Default NHL option */}
                 <button
@@ -305,7 +311,7 @@ export default function PlayerCard({ fixed = false }: PlayerCardProps) {
                 </button>
 
                 {/* Team options */}
-                {teams.map((team) => (
+                {teams && teams.length > 0 && teams.map((team) => (
                   <TeamDropdownItem
                     key={team.teamAbbrev.default}
                     team={team}
@@ -320,7 +326,7 @@ export default function PlayerCard({ fixed = false }: PlayerCardProps) {
           <div
             className={`flex flex-1 flex-col items-start min-w-0 rounded-t-md ${
               fixed ? "h-16" : "h-8 sm:h-12 md:h-16 lg:h-18"
-            } ${fixed ? "" : roster.length === 0 ? "" : "hover:bg-gray-300"}`}
+            } ${fixed ? "" : !roster || roster.length === 0 ? "" : "hover:bg-gray-300"}`}
           >
             {/* Player Dropdown */}
             <div
@@ -355,7 +361,7 @@ export default function PlayerCard({ fixed = false }: PlayerCardProps) {
               ></div>
 
               {/* Player Dropdown Menu */}
-              {isPlayerDropdownOpen && selectedTeam && roster.length > 0 && (
+              {isPlayerDropdownOpen && selectedTeam && roster && roster.length > 0 && (
                 <div className="absolute top-full left-0 mt-1 w-80 bg-white border border-gray-300 rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto">
                   {/* Default player option */}
                   <button
@@ -366,7 +372,7 @@ export default function PlayerCard({ fixed = false }: PlayerCardProps) {
                   </button>
 
                   {/* Player options */}
-                  {roster.map((player) => (
+                  {roster && roster.length > 0 && roster.map((player) => (
                     <button
                       key={player.id}
                       onClick={() => handleDropdownPlayerSelect(player)}
