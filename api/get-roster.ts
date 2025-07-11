@@ -2,7 +2,10 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { securityMiddleware } from "./utils/security";
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+module.exports = async function handler(
+  req: VercelRequest,
+  res: VercelResponse
+) {
   // Apply security middleware
   const securityResult = await securityMiddleware(req, res, {
     allowedMethods: ["GET"],
@@ -39,4 +42,4 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       timestamp: new Date().toISOString(),
     });
   }
-}
+};

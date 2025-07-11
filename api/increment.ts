@@ -11,7 +11,10 @@ const redis = new Redis({
   token: env.UPSTASH_REDIS_REST_TOKEN,
 });
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+module.exports = async function handler(
+  req: VercelRequest,
+  res: VercelResponse
+) {
   // Apply security middleware
   const securityResult = await securityMiddleware(req, res, {
     allowedMethods: ["POST"],
@@ -60,4 +63,4 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       timestamp: new Date().toISOString(),
     });
   }
-}
+};
