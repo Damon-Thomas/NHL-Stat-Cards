@@ -50,12 +50,10 @@ export default function StatBox({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.toUpperCase();
 
-    // Allow "NA" or up to 2 digits, empty string becomes 0
     if (raw === "NA" || raw === "N" || /^\d{0,2}$/.test(raw)) {
       if (raw === "NA") {
         statObj?.setStat(0);
       } else if (raw === "") {
-        // Empty string (user backspaced everything) becomes 0 (shows as NA)
         statObj?.setStat(0);
       } else if (/^\d{1,2}$/.test(raw)) {
         statObj?.setStat(parseFloat(raw) || 0);
@@ -77,7 +75,6 @@ export default function StatBox({
     }
   };
 
-  // Display value: show "NA" for 0, otherwise show the number
   const displayValue =
     statObj?.stat === 0 ? "NA" : statObj?.stat.toString() || "";
 

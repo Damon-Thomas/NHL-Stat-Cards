@@ -37,7 +37,6 @@ export const teamColors: Record<
   UTA: { primary: "#69B3E7", secondary: "#000000", accent: "#FFFFFF" },
 };
 
-// Default team colors for fallback
 export const DEFAULT_TEAM_COLORS = {
   primary: "#000000",
   secondary: "#764ba2",

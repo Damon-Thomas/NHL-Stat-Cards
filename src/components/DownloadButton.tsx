@@ -18,7 +18,6 @@ export default function DownloadButton({
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handleDownload = async () => {
-    // Use the hidden card element instead of the visible one
     const hiddenCard = document.getElementById("hidden-card");
     if (!hiddenCard) {
       console.error("Hidden card element not found");
@@ -27,13 +26,10 @@ export default function DownloadButton({
 
     setIsGenerating(true);
     try {
-      console.log("Starting ultra-high-quality PNG generation...");
-
-      // Generate at very high resolution for crisp quality with fixed dimensions
       const dataUrl = await domToPng(hiddenCard, {
         quality: 1.0,
         backgroundColor: "#ffffff",
-        scale: 2, // High scale for maximum quality
+        scale: 2,
         width: 1152,
         height: 626.398,
         style: {
@@ -42,9 +38,6 @@ export default function DownloadButton({
         },
       });
 
-      console.log("PNG generation completed, downloading...");
-
-      // Create download link
       const playerName = selectedPlayer
         ? `${selectedPlayer.firstName.default}_${selectedPlayer.lastName.default}`
         : "NHL_Player";
@@ -57,8 +50,6 @@ export default function DownloadButton({
       link.download = `${playerName}${teamName}_Card.png`;
       link.href = dataUrl;
       link.click();
-
-      console.log("PNG download completed successfully!");
     } catch (error) {
       console.error("Error generating PNG:", error);
       alert("Failed to generate PNG. Please try again.");

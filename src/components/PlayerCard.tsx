@@ -30,7 +30,6 @@ export default function PlayerCard({ fixed = false }: PlayerCardProps) {
   const { selectedPlayer, setSelectedPlayer, selectedTeam, setSelectedTeam } =
     usePlayerContext();
 
-  // Internal state for data and UI
   const [teams, setTeams] = useState<Team[]>([]);
   const [roster, setRoster] = useState<Player[]>([]);
   const [loading, setLoading] = useState(false);
@@ -41,7 +40,6 @@ export default function PlayerCard({ fixed = false }: PlayerCardProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const playerDropdownRef = useRef<HTMLDivElement>(null);
 
-  // Get the local logo path for the selected team
   const selectedTeamLogoUrl = getTeamLogoPath(selectedTeam?.teamAbbrev.default);
 
   function formatAge(age: string | undefined): number {
@@ -132,7 +130,10 @@ export default function PlayerCard({ fixed = false }: PlayerCardProps) {
       const data = await response.json();
       setTeams(data.standings || []);
     } catch (err) {
-      console.log(err instanceof Error ? err.message : "Failed to fetch teams");
+      console.error(
+        "Failed to fetch teams:",
+        err instanceof Error ? err.message : "Unknown error"
+      );
     } finally {
       setLoading(false);
     }
@@ -168,8 +169,9 @@ export default function PlayerCard({ fixed = false }: PlayerCardProps) {
 
       setRoster(players);
     } catch (err) {
-      console.log(
-        err instanceof Error ? err.message : "Failed to fetch roster"
+      console.error(
+        "Failed to fetch roster:",
+        err instanceof Error ? err.message : "Unknown error"
       );
     } finally {
       setLoading(false);
@@ -177,12 +179,10 @@ export default function PlayerCard({ fixed = false }: PlayerCardProps) {
   };
 
   const handleTeamSelect = (teamId: string) => {
-    // Ensure teams is available before trying to find
     if (!teams || teams.length === 0) {
-      console.warn("Teams not loaded yet");
       return;
     }
-    
+
     const currentTeam = teams.find(
       (team) => team.teamAbbrev.default === teamId
     );
@@ -311,13 +311,15 @@ export default function PlayerCard({ fixed = false }: PlayerCardProps) {
                 </button>
 
                 {/* Team options */}
-                {teams && teams.length > 0 && teams.map((team) => (
-                  <TeamDropdownItem
-                    key={team.teamAbbrev.default}
-                    team={team}
-                    onSelect={handleDropdownTeamSelect}
-                  />
-                ))}
+                {teams &&
+                  teams.length > 0 &&
+                  teams.map((team) => (
+                    <TeamDropdownItem
+                      key={team.teamAbbrev.default}
+                      team={team}
+                      onSelect={handleDropdownTeamSelect}
+                    />
+                  ))}
               </div>
             )}
           </div>
@@ -326,7 +328,13 @@ export default function PlayerCard({ fixed = false }: PlayerCardProps) {
           <div
             className={`flex flex-1 flex-col items-start min-w-0 rounded-t-md ${
               fixed ? "h-16" : "h-8 sm:h-12 md:h-16 lg:h-18"
-            } ${fixed ? "" : !roster || roster.length === 0 ? "" : "hover:bg-gray-300"}`}
+            } ${
+              fixed
+                ? ""
+                : !roster || roster.length === 0
+                ? ""
+                : "hover:bg-gray-300"
+            }`}
           >
             {/* Player Dropdown */}
             <div
@@ -361,30 +369,35 @@ export default function PlayerCard({ fixed = false }: PlayerCardProps) {
               ></div>
 
               {/* Player Dropdown Menu */}
-              {isPlayerDropdownOpen && selectedTeam && roster && roster.length > 0 && (
-                <div className="absolute top-full left-0 mt-1 w-80 bg-white border border-gray-300 rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto">
-                  {/* Default player option */}
-                  <button
-                    onClick={() => handleDropdownPlayerSelect(null)}
-                    className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-4 border-b border-gray-200 bg-transparent"
-                  >
-                    <span className="text-sm font-medium">Select Player</span>
-                  </button>
-
-                  {/* Player options */}
-                  {roster && roster.length > 0 && roster.map((player) => (
+              {isPlayerDropdownOpen &&
+                selectedTeam &&
+                roster &&
+                roster.length > 0 && (
+                  <div className="absolute top-full left-0 mt-1 w-80 bg-white border border-gray-300 rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto">
+                    {/* Default player option */}
                     <button
-                      key={player.id}
-                      onClick={() => handleDropdownPlayerSelect(player)}
-                      className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-4 bg-transparent border-none outline-none"
+                      onClick={() => handleDropdownPlayerSelect(null)}
+                      className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-4 border-b border-gray-200 bg-transparent"
                     >
-                      <span className="text-sm font-medium">
-                        {player.firstName.default} {player.lastName.default}
-                      </span>
+                      <span className="text-sm font-medium">Select Player</span>
                     </button>
-                  ))}
-                </div>
-              )}
+
+                    {/* Player options */}
+                    {roster &&
+                      roster.length > 0 &&
+                      roster.map((player) => (
+                        <button
+                          key={player.id}
+                          onClick={() => handleDropdownPlayerSelect(player)}
+                          className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-4 bg-transparent border-none outline-none"
+                        >
+                          <span className="text-sm font-medium">
+                            {player.firstName.default} {player.lastName.default}
+                          </span>
+                        </button>
+                      ))}
+                  </div>
+                )}
             </div>
           </div>
         </div>

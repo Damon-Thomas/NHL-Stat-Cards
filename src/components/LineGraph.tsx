@@ -37,7 +37,6 @@ function LineGraph({
 
   const { single, multiple, updateXPoints } = graphContext;
 
-  // Use single or multiple datasets based on showAll prop
   const mainSet = showAll ? multiple.mainSet : single.singleSet;
   const setMainSet = showAll ? multiple.setMainSet : single.setSingleSet;
   const secondSet = showAll ? multiple.secondSet : multiple.secondSet;
@@ -61,36 +60,6 @@ function LineGraph({
   ];
 
   const scaleY = (val: number) => innerHeight * val;
-
-  //   const handleDrag = (
-  //     setPoints: Function,
-  //     index: number,
-  //     e: React.MouseEvent<SVGCircleElement>
-  //   ) => {
-  //     e.preventDefault();
-  //     const svg = e.currentTarget.ownerSVGElement;
-  //     if (!svg) return;
-
-  //     const rect = svg.getBoundingClientRect();
-
-  //     const onMove = (moveEvent: MouseEvent) => {
-  //       const y = moveEvent.clientY - rect.top - MARGIN.top;
-  //       const ratioY = Math.max(0, Math.min(1, y / innerHeight));
-  //       setPoints((prev: any[]) => {
-  //         const updated = [...prev];
-  //         updated[index] = { ...updated[index], y: ratioY };
-  //         return updated;
-  //       });
-  //     };
-
-  //     const onUp = () => {
-  //       window.removeEventListener("mousemove", onMove);
-  //       window.removeEventListener("mouseup", onUp);
-  //     };
-
-  //     window.addEventListener("mousemove", onMove);
-  //     window.addEventListener("mouseup", onUp);
-  //   };
 
   const handleDrag = (
     setPoints: Function,

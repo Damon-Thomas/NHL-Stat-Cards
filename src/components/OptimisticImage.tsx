@@ -25,17 +25,14 @@ export default function OptimisticImage({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Reset to fallback when src changes
     setCurrentSrc(fallbackSrc);
     setIsLoading(true);
 
-    // If src is the same as fallback, no need to load
     if (src === fallbackSrc) {
       setIsLoading(false);
       return;
     }
 
-    // Preload the actual image
     const img = new Image();
 
     img.onload = () => {
@@ -45,14 +42,12 @@ export default function OptimisticImage({
     };
 
     img.onerror = () => {
-      // Keep the fallback image if loading fails
       setIsLoading(false);
       onError?.();
     };
 
     img.src = src;
 
-    // Cleanup function
     return () => {
       img.onload = null;
       img.onerror = null;

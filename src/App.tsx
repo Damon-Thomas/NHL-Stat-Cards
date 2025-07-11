@@ -1,5 +1,4 @@
-// War value unfocuses on change right now, but it should not
-
+import { Analytics } from "@vercel/analytics/next";
 import { useState, useEffect } from "react";
 import CardCount from "./components/CardCount";
 import DownloadButton from "./components/DownloadButton";
@@ -35,17 +34,14 @@ function AppContent() {
     }
   }, []);
 
-  // Fetch card count on component mount
   useEffect(() => {
     getCount();
   }, []);
 
-  // Just to display it
   const getCount = async () => {
     try {
       const res = await fetch("/api/get-count");
       const json = await res.json();
-      console.log("Total player cards created:", json.count);
       setCardCount(json.count);
     } catch (err) {
       console.error("Failed to fetch card count:", err);
@@ -129,6 +125,7 @@ function AppContent() {
           setIsHelpModalOpen(false);
         }}
       />
+      <Analytics />
     </div>
   );
 }
