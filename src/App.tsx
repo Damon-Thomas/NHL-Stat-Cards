@@ -51,7 +51,7 @@ function AppContent() {
   return (
     <div className="h-screen w-full flex flex-col items-center justify-start overflow-auto ">
       <div className="fixed top-0 left-0 h-20 w-full p-2 bg-white text-black shadow-lg z-10 flex justify-center items-center">
-        <div className="w-full max-w-6xl flex justify-between items-center px-2">
+        <div className="w-full max-w-6xl flex justify-between items-center sm:px-2">
           <CardCount count={cardCount} />
           <div className="flex items-center gap-2 sm:gap-4">
             <button
@@ -79,8 +79,8 @@ function AppContent() {
               selectedTeam={selectedTeam || null}
               className="px-3 py-2 sm:px-6 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm sm:text-base"
             >
-              <span className="sm:hidden">Download</span>
-              <span className="hidden sm:inline">Download Card</span>
+              <span className="md:hidden">Download</span>
+              <span className="hidden md:inline">Download Card</span>
             </DownloadButton>
           </div>
         </div>

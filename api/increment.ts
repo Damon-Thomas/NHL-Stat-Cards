@@ -39,7 +39,7 @@ module.exports = async function handler(
     const recentKey = `recent_increment:${clientIP}`;
     const recentCount = (await redis.get<number>(recentKey)) || 0;
 
-    if (recentCount >= 3) {
+    if (recentCount >= 30) {
       // Max 3 increments per 5 minutes per IP
       return res.status(429).json({
         error:

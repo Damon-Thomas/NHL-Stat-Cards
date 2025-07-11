@@ -13,7 +13,7 @@ export default function DownloadButton({
   selectedPlayer,
   selectedTeam,
   className = "",
-  children = "Download Card as PNG",
+  children = "Download Card",
 }: DownloadButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -58,6 +58,14 @@ export default function DownloadButton({
     }
   };
 
+  // Ensure consistent button width by using fixed width container
+  const getButtonText = () => {
+    if (isGenerating) {
+      return "Loading...";
+    }
+    return children;
+  };
+
   return (
     <button
       onClick={handleDownload}
@@ -68,7 +76,9 @@ export default function DownloadButton({
           : "bg-blue-500 hover:bg-blue-600"
       } text-white ${className}`}
     >
-      {isGenerating ? "Generating PNG..." : children}
+      <span className="inline-block text-center whitespace-nowrap w-18 sm:w-30 md:w-32">
+        {getButtonText()}
+      </span>
     </button>
   );
 }
