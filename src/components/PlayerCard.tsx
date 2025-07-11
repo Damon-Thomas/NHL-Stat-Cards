@@ -467,50 +467,32 @@ export default function PlayerCard({ fixed = false }: PlayerCardProps) {
           <StatBox large={true} editable={!fixed}></StatBox>
 
           <div
-            className={`grid grid-rows-4 min-w-0 ${
+            className={`grid grid-cols-2 grid-rows-4 gap-x-2 sm:gap-x-4 md:gap-x-6 items-center min-w-0 ${
               fixed ? "text-2xl" : "text-xs sm:text-base md:text-2xl"
             }`}
+            style={{
+              gridTemplateColumns: fixed ? "48px 1fr" : "max-content 1fr",
+            }}
           >
-            <div
-              className={`flex items-center justify-center ${
-                fixed ? "gap-4" : "gap-2 sm:gap-4"
-              }`}
-            >
-              <p className="flex- ">Pos:</p>
-              <p className="flex-1 font-black text-left">
-                {formatPosition(selectedPlayer?.positionCode)}
-              </p>
-            </div>
-            <div
-              className={`flex items-center ${
-                fixed ? "gap-4" : "gap-2 sm:gap-4"
-              }`}
-            >
-              <p className="flex-2 ">Age:</p>
-              <p className="flex-1 font-black text-left">
-                {formatAge(selectedPlayer?.birthDate)}
-              </p>
-            </div>
-            <div
-              className={`flex items-center ${
-                fixed ? "gap-4" : "gap-2 sm:gap-4"
-              }`}
-            >
-              <p className="flex-2">Hnd:</p>
-              <p className="flex-1 font-black text-left">
-                {formatHandedness(selectedPlayer?.shootsCatches)}
-              </p>
-            </div>
-            <div
-              className={`flex items-center ${
-                fixed ? "gap-6" : "gap-2 sm:gap-6"
-              }`}
-            >
-              <p className="flex-2">Hgt:</p>
-              <p className="flex-1 font-black text-left">
-                {inchesToFeet(selectedPlayer?.heightInInches)}
-              </p>
-            </div>
+            <p className="text-right whitespace-nowrap">Pos:</p>
+            <p className="font-black text-left">
+              {formatPosition(selectedPlayer?.positionCode)}
+            </p>
+
+            <p className="text-right whitespace-nowrap">Age:</p>
+            <p className="font-black text-left">
+              {formatAge(selectedPlayer?.birthDate)}
+            </p>
+
+            <p className="text-right whitespace-nowrap">Hnd:</p>
+            <p className="font-black text-left">
+              {formatHandedness(selectedPlayer?.shootsCatches)}
+            </p>
+
+            <p className="text-right whitespace-nowrap">Hgt:</p>
+            <p className="font-black text-left">
+              {inchesToFeet(selectedPlayer?.heightInInches)}
+            </p>
           </div>
         </div>
         <div

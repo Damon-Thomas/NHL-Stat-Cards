@@ -238,7 +238,7 @@ function LineGraph({
         <button
           data-edit-button
           onClick={() => setShowFormControls(!showFormControls)}
-          className="absolute top-0 right-0 sm:top-1 sm:right-1 z-10 bg-gray-600 text-white w-6 h-6 sm:w-auto sm:h-auto sm:px-2 sm:py-1 rounded text-xs hover:bg-gray-700 transition-colors flex items-center justify-center"
+          className="absolute -top-1 -right-1 sm:top-1 sm:right-1 z-10 bg-gray-600 text-white w-5 h-5 sm:w-auto sm:h-auto sm:px-2 sm:py-1 rounded text-xs hover:bg-gray-700 transition-colors flex items-center justify-center"
           style={{ fontSize: "8px" }}
         >
           <span className="hidden sm:inline">
@@ -343,7 +343,7 @@ function LineGraph({
 
               {/* Multiple graphs controls - responsive layout */}
               {showAll && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-12">
                   <div className="text-center">
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg mb-4">
                       <div className="w-3 h-3 rounded-full bg-[#202947]"></div>
