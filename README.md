@@ -41,7 +41,7 @@ A modern, interactive web application for creating and downloading custom NHL pl
 
 ### Prerequisites
 
-- **Node.js** (v18 or higher)
+- **Node.js** (v20 or higher)
 - **pnpm** package manager
 - **Upstash Redis** account (for analytics and rate limiting)
 
