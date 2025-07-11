@@ -5,6 +5,7 @@ import type { Team, Player } from "../types";
 interface DownloadButtonProps {
   selectedPlayer: Player | null;
   selectedTeam: Team | null;
+  onCardDownloaded?: () => Promise<void>;
   className?: string;
   children?: React.ReactNode;
 }
@@ -12,6 +13,7 @@ interface DownloadButtonProps {
 export default function DownloadButton({
   selectedPlayer,
   selectedTeam,
+  onCardDownloaded,
   className = "",
   children = "Download Card",
 }: DownloadButtonProps) {
@@ -50,6 +52,11 @@ export default function DownloadButton({
       link.download = `${playerName}${teamName}_Card.png`;
       link.href = dataUrl;
       link.click();
+
+      // Call the callback to increment the card count
+      if (onCardDownloaded) {
+        await onCardDownloaded();
+      }
     } catch (error) {
       console.error("Error generating PNG:", error);
       alert("Failed to generate PNG. Please try again.");

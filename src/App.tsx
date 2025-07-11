@@ -8,23 +8,57 @@ import "./App.css";
 import { StatProvider } from "./contexts/statContext";
 import { GraphProvider } from "./contexts/graphContext";
 import { PlayerProvider, usePlayerContext } from "./contexts/playerContext";
+import {
+  NotificationProvider,
+  useNotification,
+} from "./contexts/notificationContext";
 
 function App() {
   return (
-    <PlayerProvider>
-      <StatProvider>
-        <GraphProvider>
-          <AppContent />
-        </GraphProvider>
-      </StatProvider>
-    </PlayerProvider>
+    <NotificationProvider>
+      <PlayerProvider>
+        <StatProvider>
+          <GraphProvider>
+            <AppContent />
+          </GraphProvider>
+        </StatProvider>
+      </PlayerProvider>
+    </NotificationProvider>
   );
 }
 
 function AppContent() {
   const { selectedPlayer, selectedTeam } = usePlayerContext();
+  const { addNotification } = useNotification();
   const [cardCount, setCardCount] = useState<number>(0);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+
+  const incrementCardCount = async () => {
+    // Optimistically update the UI
+    setCardCount((prev) => prev + 1);
+
+    try {
+      const res = await fetch("/api/increment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to increment card count");
+      }
+
+      const json = await res.json();
+      // Update with the actual count from the server
+      setCardCount(json.count);
+    } catch (err) {
+      console.error("Failed to increment card count:", err);
+      // Revert the optimistic update on error
+      setCardCount((prev) => prev - 1);
+      addNotification("Failed to update card count", "error");
+    }
+  };
 
   // Check if user has seen help modal before
   useEffect(() => {
@@ -77,6 +111,7 @@ function AppContent() {
             <DownloadButton
               selectedPlayer={selectedPlayer}
               selectedTeam={selectedTeam || null}
+              onCardDownloaded={incrementCardCount}
               className="px-3 py-2 sm:px-6 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm sm:text-base"
             >
               <span className="md:hidden">Download</span>

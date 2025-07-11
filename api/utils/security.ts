@@ -1,21 +1,80 @@
 // api/utils/security.ts
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { Redis } from "@upstash/redis";
-import { validateEnvVars, getAllowedOrigins } from "./env";
-
-// Validate environment variables on import
-const env = validateEnvVars();
-
-const redis = new Redis({
-  url: env.UPSTASH_REDIS_REST_URL,
-  token: env.UPSTASH_REDIS_REST_TOKEN,
-});
+import { getAllowedOrigins } from "./env";
 
 // Rate limiting configuration
 const RATE_LIMITS = {
-  GET: { requests: 60, window: 60 }, // 60 requests per minute for GET
-  POST: { requests: 30, window: 60 }, // 30 requests per minute for POST
-  INCREMENT: { requests: 10, window: 60 }, // 10 increments per minute
+  GET: { requests: 100, window: 60 }, // 100 requests per minute for GET
+  POST: { requests: 60, window: 60 }, // 60 requests per minute for POST
+  INCREMENT: { requests: 100, window: 60 }, // 100 increments per minute (much more generous)
+};
+
+// In-memory storage for rate limiting
+const rateLimit = {
+  // Store rate limit data with automatic cleanup
+  limits: new Map<string, { count: number; expires: number }>(),
+
+  // Clean expired entries every 5 minutes
+  cleanup: function () {
+    const now = Date.now();
+    for (const [key, value] of this.limits.entries()) {
+      if (value.expires < now) {
+        this.limits.delete(key);
+      }
+    }
+  },
+
+  // Check and update rate limit
+  check: function (
+    key: string,
+    limit: number,
+    window: number
+  ): { allowed: boolean; remaining: number } {
+    const now = Date.now();
+    const expireTime = now + window * 1000;
+
+    // Clean up old entries occasionally (1% chance on each request)
+    if (Math.random() < 0.01) this.cleanup();
+
+    // Get current count or initialize
+    const current = this.limits.get(key);
+    if (!current || current.expires < now) {
+      this.limits.set(key, { count: 1, expires: expireTime });
+      return { allowed: true, remaining: limit - 1 };
+    }
+
+    // Increment and check
+    current.count += 1;
+    const remaining = Math.max(0, limit - current.count);
+    return { allowed: current.count <= limit, remaining };
+  },
+};
+
+// In-memory storage for fraud detection
+const fraudDetection = {
+  limits: new Map<string, { count: number; expires: number }>(),
+
+  // Check and update fraud detection limits
+  check: function (clientIP: string): { allowed: boolean; count: number } {
+    const key = `recent_increment:${clientIP}`;
+    const now = Date.now();
+    const window = 300; // 5 minutes
+    const limit = 120; // Max 120 increments per 5 minutes
+
+    // Get current count or initialize
+    const current = this.limits.get(key);
+    if (!current || current.expires < now) {
+      this.limits.set(key, { count: 1, expires: now + window * 1000 });
+      return { allowed: true, count: 1 };
+    }
+
+    // Increment and check
+    current.count += 1;
+    return {
+      allowed: current.count <= limit,
+      count: current.count,
+    };
+  },
 };
 
 // Get allowed origins from environment
@@ -26,6 +85,8 @@ export interface SecurityOptions {
   rateLimit?: keyof typeof RATE_LIMITS;
   requireOriginCheck?: boolean;
 }
+
+export { fraudDetection };
 
 /**
  * Get client IP address from various headers
@@ -44,34 +105,18 @@ function getClientIP(req: VercelRequest): string {
 }
 
 /**
- * Check rate limiting for a client
+ * Check rate limiting for a client using in-memory storage
  */
-async function checkRateLimit(
+function checkRateLimit(
   clientIP: string,
   endpoint: string,
   limitType: keyof typeof RATE_LIMITS
-): Promise<{ allowed: boolean; remaining: number }> {
+): { allowed: boolean; remaining: number } {
   const { requests, window } = RATE_LIMITS[limitType];
   const key = `rate_limit:${endpoint}:${clientIP}`;
 
-  try {
-    const current = await redis.incr(key);
-
-    if (current === 1) {
-      await redis.expire(key, window);
-    }
-
-    const remaining = Math.max(0, requests - current);
-
-    return {
-      allowed: current <= requests,
-      remaining,
-    };
-  } catch (error) {
-    console.error("Rate limiting error:", error);
-    // On Redis error, allow the request but log it
-    return { allowed: true, remaining: requests };
-  }
+  // Use in-memory rate limiting instead of Redis
+  return rateLimit.check(key, requests, window);
 }
 
 /**
@@ -171,7 +216,7 @@ export async function securityMiddleware(
   // Rate limiting
   const clientIP = getClientIP(req);
   const endpoint = req.url?.split("?")[0] || "unknown";
-  const rateLimitResult = await checkRateLimit(clientIP, endpoint, rateLimit);
+  const rateLimitResult = checkRateLimit(clientIP, endpoint, rateLimit);
 
   // Set rate limit headers
   res.setHeader("X-RateLimit-Limit", RATE_LIMITS[rateLimit].requests);
@@ -185,6 +230,7 @@ export async function securityMiddleware(
     res.status(429).json({
       error: "Rate limit exceeded",
       retryAfter: RATE_LIMITS[rateLimit].window,
+      message: `Too many requests. Please wait ${RATE_LIMITS[rateLimit].window} seconds before trying again.`,
     });
     return { allowed: false, error: "Rate limit exceeded" };
   }

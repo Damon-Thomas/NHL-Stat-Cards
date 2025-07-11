@@ -1,6 +1,6 @@
 import { Redis } from "@upstash/redis";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { securityMiddleware } from "./utils/security";
+import { securityMiddleware, fraudDetection } from "./utils/security";
 import { validateEnvVars } from "./utils/env";
 
 // Validate environment variables
@@ -27,7 +27,7 @@ module.exports = async function handler(
   }
 
   try {
-    // Add fraud detection: Check if increment is too frequent from same IP
+    // Get client IP for fraud detection
     const forwarded = req.headers["x-forwarded-for"];
     const realIP = req.headers["x-real-ip"];
     const clientIP = (
@@ -36,24 +36,20 @@ module.exports = async function handler(
         : realIP || "unknown"
     ) as string;
 
-    const recentKey = `recent_increment:${clientIP}`;
-    const recentCount = (await redis.get<number>(recentKey)) || 0;
+    // Use in-memory fraud detection instead of Redis calls
+    const fraudCheck = fraudDetection.check(clientIP);
 
-    if (recentCount >= 30) {
-      // Max 3 increments per 5 minutes per IP
+    if (!fraudCheck.allowed) {
       return res.status(429).json({
         error:
           "Too many card creations. Please wait before creating another card.",
         timestamp: new Date().toISOString(),
+        retryAfter: 300, // 5 minutes in seconds
       });
     }
 
-    // Increment the counter
+    // Only one Redis call for the actual increment operation
     const count = await redis.incr("player_card_count");
-
-    // Track this increment for fraud detection
-    await redis.incr(recentKey);
-    await redis.expire(recentKey, 300); // 5 minutes
 
     res.status(200).json({ count });
   } catch (err: any) {

@@ -8,6 +8,7 @@ import { getTeamLogoPath } from "../utils/teamLogos";
 import { getProxiedImageUrl } from "../utils/imageProxy";
 import { getTeamColors } from "../data/colors";
 import { usePlayerContext } from "../contexts/playerContext";
+import { useNotification } from "../contexts/notificationContext";
 
 interface PlayerCardProps {
   fixed?: boolean;
@@ -29,6 +30,7 @@ const otherStats = [
 export default function PlayerCard({ fixed = false }: PlayerCardProps) {
   const { selectedPlayer, setSelectedPlayer, selectedTeam, setSelectedTeam } =
     usePlayerContext();
+  const { addNotification } = useNotification();
 
   const [teams, setTeams] = useState<Team[]>([]);
   const [roster, setRoster] = useState<Player[]>([]);
@@ -223,10 +225,50 @@ export default function PlayerCard({ fixed = false }: PlayerCardProps) {
       });
 
       if (!res.ok) {
+        if (res.status === 429) {
+          // Rate limited
+          const errorData = await res.json().catch(() => ({}));
+          const retryAfter = errorData.retryAfter || 300; // Default to 5 minutes
+          const minutes = Math.ceil(retryAfter / 60);
+
+          addNotification(
+            `Rate limit exceeded. Please wait ${minutes} minute${
+              minutes > 1 ? "s" : ""
+            } before creating another card.`,
+            "warning",
+            8000 // Show for 8 seconds
+          );
+        } else if (res.status === 403) {
+          // Forbidden - likely origin/CORS issue
+          addNotification(
+            "Access denied. Please refresh the page and try again.",
+            "error",
+            6000
+          );
+        } else {
+          // Other HTTP errors
+          addNotification(
+            "Failed to create card. Please try again.",
+            "error",
+            5000
+          );
+        }
         throw new Error(`HTTP error! status: ${res.status}`);
       }
+
+      // Success - optionally show success notification
+      // addNotification("Card created successfully!", "success", 3000);
     } catch (err) {
       console.error("Failed to increment card count:", err);
+
+      // Only show network error if we haven't already shown a specific error
+      if (err instanceof Error && !err.message.includes("HTTP error!")) {
+        addNotification(
+          "Network error. Please check your connection and try again.",
+          "error",
+          5000
+        );
+      }
     }
   };
 
