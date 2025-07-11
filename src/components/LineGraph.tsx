@@ -99,7 +99,7 @@ function LineGraph({
   const handleTouchDrag = (
     setPoints: Function,
     index: number,
-    initialYRatio: number,
+    _initialYRatio: number,
     e: React.TouchEvent<SVGCircleElement>
   ) => {
     e.preventDefault();
@@ -108,14 +108,10 @@ function LineGraph({
 
     const rect = svg.getBoundingClientRect();
     const touch = e.touches[0];
-
-    const startY = touch.clientY - rect.top - MARGIN.top;
-    const offset = startY - innerHeight * initialYRatio;
-
-    const onTouchMove = (moveEvent: TouchEvent) => {
-      if (moveEvent.touches.length === 0) return;
-      const newTouch = moveEvent.touches[0];
-      const newY = newTouch.clientY - rect.top - MARGIN.top - offset;
+    
+    // Direct touch positioning without offset calculation for more intuitive feel
+    const updatePointPosition = (clientY: number) => {
+      const newY = clientY - rect.top - MARGIN.top;
       const ratioY = Math.max(0, Math.min(1, newY / innerHeight));
 
       setPoints((prev: any[]) => {
@@ -125,13 +121,24 @@ function LineGraph({
       });
     };
 
+    // Initial update
+    updatePointPosition(touch.clientY);
+
+    const onTouchMove = (moveEvent: TouchEvent) => {
+      moveEvent.preventDefault(); // Prevent scrolling while dragging
+      if (moveEvent.touches.length === 0) return;
+      updatePointPosition(moveEvent.touches[0].clientY);
+    };
+
     const onTouchEnd = () => {
       window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("touchcancel", onTouchEnd);
     };
 
-    window.addEventListener("touchmove", onTouchMove);
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
     window.addEventListener("touchend", onTouchEnd);
+    window.addEventListener("touchcancel", onTouchEnd);
   };
 
   const renderLine = (
@@ -156,16 +163,28 @@ function LineGraph({
     setPoints: Function
   ) =>
     points.map((p, i) => (
-      <circle
-        key={i}
-        cx={p.x + MARGIN.left}
-        cy={scaleY(p.y) + MARGIN.top}
-        r={POINT_RADIUS}
-        fill={color}
-        cursor="pointer"
-        onMouseDown={(e) => handleDrag(setPoints, i, p.y, e)}
-        onTouchStart={(e) => handleTouchDrag(setPoints, i, p.y, e)}
-      />
+      <g key={i}>
+        {/* Larger invisible hit area for better touch interaction */}
+        <circle
+          cx={p.x + MARGIN.left}
+          cy={scaleY(p.y) + MARGIN.top}
+          r={POINT_RADIUS * 3} // 3x larger touch area
+          fill="transparent"
+          stroke="transparent"
+          strokeWidth={1}
+          cursor="grab"
+          onMouseDown={(e) => handleDrag(setPoints, i, p.y, e)}
+          onTouchStart={(e) => handleTouchDrag(setPoints, i, p.y, e)}
+        />
+        {/* Visible dot (unchanged for PNG output) */}
+        <circle
+          cx={p.x + MARGIN.left}
+          cy={scaleY(p.y) + MARGIN.top}
+          r={POINT_RADIUS}
+          fill={color}
+          pointerEvents="none"
+        />
+      </g>
     ));
 
   return (
