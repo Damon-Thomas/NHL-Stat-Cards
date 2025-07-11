@@ -1,6 +1,6 @@
 // api/get-teams.ts
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { securityMiddleware } from "./utils/security.js";
+import { securityMiddleware } from "./utils/security";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Apply security middleware

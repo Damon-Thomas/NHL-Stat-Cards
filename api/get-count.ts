@@ -1,7 +1,7 @@
 import { Redis } from "@upstash/redis";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { securityMiddleware } from "./utils/security.js";
-import { validateEnvVars } from "./utils/env.js";
+import { securityMiddleware } from "./utils/security";
+import { validateEnvVars } from "./utils/env";
 
 // Validate environment variables
 const env = validateEnvVars();
