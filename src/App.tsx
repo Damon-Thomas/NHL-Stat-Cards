@@ -4,6 +4,7 @@ import CardCount from "./components/CardCount";
 import DownloadButton from "./components/DownloadButton";
 import PlayerCard from "./components/PlayerCard";
 import HelpModal from "./components/HelpModal";
+import Footer from "./components/Footer";
 import "./App.css";
 import { StatProvider } from "./contexts/statContext";
 import { GraphProvider } from "./contexts/graphContext";
@@ -123,14 +124,14 @@ function AppContent() {
       <div className="pt-24 px-1 sm:px-4 w-full flex justify-center">
         <PlayerCard />
       </div>
-      {/* Background for hidden card */}
+      {/* Full screen background for hidden card */}
       <div
         style={{
           position: "fixed",
           top: 0,
           left: 0,
-          width: 1152,
-          height: 626.398,
+          width: "100vw",
+          height: "100vh",
           backgroundColor: "#242424",
           zIndex: -98,
           pointerEvents: "none",
@@ -160,6 +161,10 @@ function AppContent() {
           setIsHelpModalOpen(false);
         }}
       />
+
+      {/* Footer */}
+      <Footer />
+
       <Analytics />
     </div>
   );

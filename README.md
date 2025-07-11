@@ -312,3 +312,7 @@ For questions or support, please open an issue on GitHub.
 ---
 
 **Built with ❤️ for hockey fans everywhere**
+
+## ⚠️ Disclaimer
+
+NHL Stat Cards is an unofficial fan project and is not affiliated with or endorsed by the NHL, its teams, or players. All logos and images belong to their respective owners.
