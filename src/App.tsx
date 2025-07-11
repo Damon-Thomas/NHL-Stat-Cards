@@ -208,7 +208,17 @@ function AppContent() {
   // useEffect or after card creation
   const incrementCount = async () => {
     try {
-      const res = await fetch("/api/increment");
+      const res = await fetch("/api/increment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
       const json = await res.json();
       console.log("New count:", json.count);
       setCardCount(json.count);
