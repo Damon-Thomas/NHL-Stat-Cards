@@ -53,11 +53,17 @@ export default function HelpModal({ isOpen, onClose }: HelpModalProps) {
                 Watch Video
               </summary>
               <div className="mt-2 p-3 bg-gray-50 rounded-lg">
-                <div className="w-full h-32 bg-gray-200 rounded-lg flex items-center justify-center">
-                  <span className="text-gray-500">
-                    Team Selection Video Placeholder
-                  </span>
-                </div>
+                <video
+                  className="w-full h-auto rounded-lg"
+                  controls
+                  autoPlay
+                  loop
+                  muted
+                  preload="metadata"
+                >
+                  <source src="/videos/ChangeTeam.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
               </div>
             </details>
           </div>
@@ -80,12 +86,12 @@ export default function HelpModal({ isOpen, onClose }: HelpModalProps) {
             </div>
             <div className="sm:ml-16">
               <p className="text-gray-600 mb-2">
-                After selecting a team, click on the player name area to browse
-                the team's roster. Players are sorted alphabetically by last
-                name.
+                After selecting a team, click on the player name area to view
+                the roster. Players are sorted alphabetically by last name.
               </p>
               <p className="text-sm text-blue-600 font-medium">
-                💡 Tip: Player photos and basic info will load automatically
+                💡 Tip: Player photos and information load automatically when
+                selected
               </p>
             </div>
             <details className="group mt-4">
@@ -93,11 +99,17 @@ export default function HelpModal({ isOpen, onClose }: HelpModalProps) {
                 Watch Video
               </summary>
               <div className="mt-2 p-3 bg-gray-50 rounded-lg">
-                <div className="w-full h-32 bg-gray-200 rounded-lg flex items-center justify-center">
-                  <span className="text-gray-500">
-                    Player Selection Video Placeholder
-                  </span>
-                </div>
+                <video
+                  className="w-full h-auto rounded-lg"
+                  controls
+                  autoPlay
+                  loop
+                  muted
+                  preload="metadata"
+                >
+                  <source src="/videos/SelectPlayer.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
               </div>
             </details>
           </div>
@@ -137,11 +149,17 @@ export default function HelpModal({ isOpen, onClose }: HelpModalProps) {
                 Watch Video
               </summary>
               <div className="mt-2 p-3 bg-gray-50 rounded-lg">
-                <div className="w-full h-32 bg-gray-200 rounded-lg flex items-center justify-center">
-                  <span className="text-gray-500">
-                    Stats Editing Video Placeholder
-                  </span>
-                </div>
+                <video
+                  className="w-full h-auto rounded-lg"
+                  controls
+                  autoPlay
+                  loop
+                  muted
+                  preload="metadata"
+                >
+                  <source src="/videos/EditStats.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
               </div>
             </details>
           </div>
@@ -186,11 +204,17 @@ export default function HelpModal({ isOpen, onClose }: HelpModalProps) {
                 Watch Video
               </summary>
               <div className="mt-2 p-3 bg-gray-50 rounded-lg">
-                <div className="w-full h-32 bg-gray-200 rounded-lg flex items-center justify-center">
-                  <span className="text-gray-500">
-                    Graph Editing Video Placeholder
-                  </span>
-                </div>
+                <video
+                  className="w-full h-auto rounded-lg"
+                  controls
+                  autoPlay
+                  loop
+                  muted
+                  preload="metadata"
+                >
+                  <source src="/videos/LineGraphEdit.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
               </div>
             </details>
           </div>
@@ -209,11 +233,17 @@ export default function HelpModal({ isOpen, onClose }: HelpModalProps) {
                 Watch Video
               </summary>
               <div className="mt-2 p-3 bg-white rounded-lg">
-                <div className="w-full h-32 bg-gray-200 rounded-lg flex items-center justify-center">
-                  <span className="text-gray-500">
-                    Download Tutorial Video Placeholder
-                  </span>
-                </div>
+                <video
+                  className="w-full h-auto rounded-lg"
+                  controls
+                  autoPlay
+                  loop
+                  muted
+                  preload="metadata"
+                >
+                  <source src="/videos/DownloadCard.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
               </div>
             </details>
           </div>
