@@ -1,4 +1,6 @@
-# 🏒 [NHL Stat Cards](https://github.com/Damon-Thomas/NHL-Stat-Cards)
+# 🏒 [NHL Stat Cards](https://nhl-stat-cards.vercel.app/) 🔗
+
+> **[🌐 Build your stat card here →](https://nhl-stat-cards.vercel.app/)**
 
 A modern, interactive web application for creating and downloading custom NHL player stat cards. Built with React, TypeScript, and powered by real-time NHL API data.
 
