@@ -1,4 +1,4 @@
-# 🏒 NHL Stat Cards
+# 🏒 [NHL Stat Cards](https://github.com/Damon-Thomas/NHL-Stat-Cards)
 
 A modern, interactive web application for creating and downloading custom NHL player stat cards. Built with React, TypeScript, and powered by real-time NHL API data.
 
