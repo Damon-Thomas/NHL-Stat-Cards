@@ -39,10 +39,18 @@ function AppContent() {
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isPlayerDropdownOpen, setIsPlayerDropdownOpen] = useState(false);
-  const [isHelpModalOpen, setIsHelpModalOpen] = useState(true);
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const playerDropdownRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Check if user has seen help modal before
+  useEffect(() => {
+    const hasSeenHelp = localStorage.getItem("nhl-stat-cards-help-seen");
+    if (!hasSeenHelp) {
+      setIsHelpModalOpen(true);
+    }
+  }, []);
 
   // Get the local logo path for the selected team
   const selectedTeamLogoUrl = getTeamLogoPath(selectedTeam?.teamAbbrev.default);
@@ -611,7 +619,10 @@ function AppContent() {
       {/* Help Modal */}
       <HelpModal
         isOpen={isHelpModalOpen}
-        onClose={() => setIsHelpModalOpen(false)}
+        onClose={() => {
+          localStorage.setItem("nhl-stat-cards-help-seen", "true");
+          setIsHelpModalOpen(false);
+        }}
       />
     </div>
   );
