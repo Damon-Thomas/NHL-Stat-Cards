@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useGraph } from "../contexts/graphContext";
 
 const POINT_RADIUS = 10;
@@ -24,12 +24,16 @@ function LineGraph({
   showAll = true,
   width = 600,
   height = 300,
+  fixed = false,
 }: {
   showAll?: boolean;
   width?: number;
   height?: number;
+  fixed?: boolean;
 }) {
   const graphContext = useGraph();
+  const [showFormControls, setShowFormControls] = useState(false);
+  const formRef = useRef<HTMLDivElement>(null);
 
   if (!graphContext) {
     throw new Error("LineGraph must be used within a GraphProvider");
@@ -108,7 +112,7 @@ function LineGraph({
 
     const rect = svg.getBoundingClientRect();
     const touch = e.touches[0];
-    
+
     // Direct touch positioning without offset calculation for more intuitive feel
     const updatePointPosition = (clientY: number) => {
       const newY = clientY - rect.top - MARGIN.top;
@@ -139,6 +143,25 @@ function LineGraph({
     window.addEventListener("touchmove", onTouchMove, { passive: false });
     window.addEventListener("touchend", onTouchEnd);
     window.addEventListener("touchcancel", onTouchEnd);
+  };
+
+  const handleFormValueChange = (
+    setPoints: Function,
+    index: number,
+    value: number
+  ) => {
+    const clampedValue = Math.max(0, Math.min(100, value));
+    const ratioY = 1 - clampedValue / 100; // Convert percentage to y ratio (invert for SVG)
+
+    setPoints((prev: any[]) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], y: ratioY };
+      return updated;
+    });
+  };
+
+  const getPercentageValue = (point: { y: number }) => {
+    return Math.round((1 - point.y) * 100);
   };
 
   const renderLine = (
@@ -187,8 +210,260 @@ function LineGraph({
       </g>
     ));
 
+  // Handle clicks outside modal
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (formRef.current && !formRef.current.contains(event.target as Node)) {
+        const target = event.target as HTMLElement;
+        // Don't close if clicking the edit button
+        if (!target.closest("button[data-edit-button]")) {
+          setShowFormControls(false);
+        }
+      }
+    };
+
+    if (showFormControls) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showFormControls]);
+
   return (
-    <div style={{ width: "100%", height: "100%" }}>
+    <div style={{ width: "100%", height: "100%", position: "relative" }}>
+      {/* Form Controls Button - hide in fixed/print version */}
+      {!fixed && (
+        <button
+          data-edit-button
+          onClick={() => setShowFormControls(!showFormControls)}
+          className="absolute top-0 right-0 sm:top-1 sm:right-1 z-10 bg-gray-600 text-white w-6 h-6 sm:w-auto sm:h-auto sm:px-2 sm:py-1 rounded text-xs hover:bg-gray-700 transition-colors flex items-center justify-center"
+          style={{ fontSize: "8px" }}
+        >
+          <span className="hidden sm:inline">
+            {showFormControls ? "Hide" : "Edit"}
+          </span>
+          <span className="sm:hidden">{showFormControls ? "×" : "✎"}</span>
+        </button>
+      )}
+
+      {/* Form Controls Modal - hide in fixed/print version */}
+      {!fixed && showFormControls && (
+        <>
+          {/* Modal backdrop */}
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-30"
+            onClick={() => setShowFormControls(false)}
+          />
+
+          {/* Modal content */}
+          <div
+            ref={formRef}
+            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40 bg-white rounded-xl shadow-2xl max-h-[80vh] overflow-y-auto w-[calc(100vw-2rem)] sm:w-auto min-w-0 sm:min-w-80 max-w-4xl border border-gray-200"
+          >
+            {/* Header with accent */}
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-4 sm:px-6 py-4 rounded-t-xl">
+              <div className="flex justify-between items-center">
+                <div className="text-base font-semibold text-white flex items-center gap-2">
+                  <svg
+                    className="w-5 h-5"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                  </svg>
+                  Edit Graph Values
+                </div>
+                <button
+                  onClick={() => setShowFormControls(false)}
+                  className="text-white hover:text-gray-200 transition-colors p-1 rounded-full hover:bg-white/10"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-4 sm:p-6">
+              {/* Single graph controls */}
+              {!showAll && (
+                <div className="text-center">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg mb-4">
+                    <div className="w-3 h-3 rounded-full bg-[#202947]"></div>
+                    <span className="text-sm font-medium text-gray-700">
+                      WAR Percentile
+                    </span>
+                  </div>
+                  <div className="space-y-3">
+                    {YEAR_LABELS.map((year, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center justify-center gap-3"
+                      >
+                        <span className="text-sm w-16 text-gray-600 font-medium">
+                          {year}:
+                        </span>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={getPercentageValue(mainSet[i])}
+                            onChange={(e) =>
+                              handleFormValueChange(
+                                setMainSet,
+                                i,
+                                parseInt(e.target.value) || 0
+                              )
+                            }
+                            className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                          />
+                        </div>
+                        <span className="text-sm text-gray-500 font-medium">
+                          %
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Multiple graphs controls - responsive layout */}
+              {showAll && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="text-center">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg mb-4">
+                      <div className="w-3 h-3 rounded-full bg-[#202947]"></div>
+                      <span className="text-sm font-medium text-gray-700">
+                        Offense
+                      </span>
+                    </div>
+                    <div className="space-y-3">
+                      {YEAR_LABELS.map((year, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center justify-center gap-2"
+                        >
+                          <span className="text-sm w-12 text-gray-600 font-medium">
+                            {year}:
+                          </span>
+                          <div className="relative">
+                            <input
+                              type="number"
+                              min="0"
+                              max="100"
+                              value={getPercentageValue(mainSet[i])}
+                              onChange={(e) =>
+                                handleFormValueChange(
+                                  setMainSet,
+                                  i,
+                                  parseInt(e.target.value) || 0
+                                )
+                              }
+                              className="w-16 px-2 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            />
+                          </div>
+                          <span className="text-xs text-gray-500">%</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="text-center">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg mb-4">
+                      <div className="w-3 h-3 rounded-full bg-[#F24758]"></div>
+                      <span className="text-sm font-medium text-gray-700">
+                        Defense
+                      </span>
+                    </div>
+                    <div className="space-y-3">
+                      {YEAR_LABELS.map((year, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center justify-center gap-2"
+                        >
+                          <span className="text-sm w-12 text-gray-600 font-medium">
+                            {year}:
+                          </span>
+                          <div className="relative">
+                            <input
+                              type="number"
+                              min="0"
+                              max="100"
+                              value={getPercentageValue(secondSet[i])}
+                              onChange={(e) =>
+                                handleFormValueChange(
+                                  setSecondSet,
+                                  i,
+                                  parseInt(e.target.value) || 0
+                                )
+                              }
+                              className="w-16 px-2 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            />
+                          </div>
+                          <span className="text-xs text-gray-500">%</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="text-center">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg mb-4">
+                      <div className="w-3 h-3 rounded-full bg-[#95CDFA]"></div>
+                      <span className="text-sm font-medium text-gray-700">
+                        Finishing
+                      </span>
+                    </div>
+                    <div className="space-y-3">
+                      {YEAR_LABELS.map((year, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center justify-center gap-2"
+                        >
+                          <span className="text-sm w-12 text-gray-600 font-medium">
+                            {year}:
+                          </span>
+                          <div className="relative">
+                            <input
+                              type="number"
+                              min="0"
+                              max="100"
+                              value={getPercentageValue(thirdSet[i])}
+                              onChange={(e) =>
+                                handleFormValueChange(
+                                  setThirdSet,
+                                  i,
+                                  parseInt(e.target.value) || 0
+                                )
+                              }
+                              className="w-16 px-2 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            />
+                          </div>
+                          <span className="text-xs text-gray-500">%</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
       <svg
         viewBox={`0 0 ${width} ${height}`}
         preserveAspectRatio="xMidYMid meet"

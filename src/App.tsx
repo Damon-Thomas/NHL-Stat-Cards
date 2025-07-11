@@ -86,9 +86,9 @@ function AppContent() {
   return (
     <div className="h-screen w-full flex flex-col items-center justify-start overflow-auto ">
       <div className="fixed top-0 left-0 h-20 w-full p-2 bg-white text-black shadow-lg z-10 flex justify-center items-center">
-        <div className="w-full max-w-6xl flex justify-between items-center sm:px-2">
+        <div className="w-full max-w-6xl flex justify-between items-center sm:px-2 px-1">
           <CardCount count={cardCount} />
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 ml-4">
             <button
               onClick={() => setIsHelpModalOpen(true)}
               className="px-2 py-2 sm:px-4 sm:py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium flex items-center gap-1 sm:gap-2"

@@ -542,7 +542,7 @@ export default function PlayerCard({ fixed = false }: PlayerCardProps) {
             WAR Percentile Rank
           </p>
           <div className="w-full" style={{ minHeight: 0 }}>
-            <LineGraph showAll={false} />
+            <LineGraph showAll={false} fixed={fixed} />
           </div>
         </div>
         <div className="flex flex-col w-full">
@@ -556,7 +556,7 @@ export default function PlayerCard({ fixed = false }: PlayerCardProps) {
             <span className="text-[#5DB4F9]">Finishing</span>
           </p>
           <div className="w-full" style={{ minHeight: 0 }}>
-            <LineGraph showAll={true} />
+            <LineGraph showAll={true} fixed={fixed} />
           </div>
         </div>
       </div>
