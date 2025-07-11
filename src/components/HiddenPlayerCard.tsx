@@ -9,7 +9,7 @@ import OptimisticImage from "./OptimisticImage";
 import StatBox from "./StatBox";
 
 const HiddenPlayerCard: React.FC = () => {
-  const { war } = useStatContext();
+  const { war, otherStats: statContextStats } = useStatContext();
   const { selectedPlayer, selectedTeam } = usePlayerContext();
 
   const otherStats = [
@@ -149,7 +149,11 @@ const HiddenPlayerCard: React.FC = () => {
           </div>
         </div>
         <div className="grid grid-cols-5 grid-rows-2 gap-1 sm:gap-2 md:gap-6 w-full min-w-0">
-          {otherStats.map((_, index) => {
+          {otherStats.map((stat, index) => {
+            const statKey = stat as keyof typeof statContextStats;
+            const statValue = statContextStats[statKey]?.stat ?? 99;
+            const backgroundColor = interpolateColor(statValue);
+
             return <StatBox editable={false} key={index} />;
           })}
         </div>

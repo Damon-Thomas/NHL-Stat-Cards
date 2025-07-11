@@ -7,9 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "security:audit": "pnpm audit",
-    "security:fix": "pnpm audit --fix"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@upstash/redis": "^1.35.1",
