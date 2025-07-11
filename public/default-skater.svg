@@ -1,7 +1,0 @@
-<!-- Default player silhouette SVG -->
-<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="200" height="200" fill="#f3f4f6"/>
-  <circle cx="100" cy="75" r="25" fill="#d1d5db"/>
-  <path d="M100 110 C80 110, 60 120, 60 140 L60 200 L140 200 L140 140 C140 120, 120 110, 100 110 Z" fill="#d1d5db"/>
-  <text x="100" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">No Image</text>
-</svg>

@@ -6,6 +6,7 @@ import CardCount from "./components/CardCount";
 import DownloadButton from "./components/DownloadButton";
 import OptimisticImage from "./components/OptimisticImage";
 import TeamDropdownItem from "./components/TeamDropdownItem";
+import HelpModal from "./components/HelpModal";
 import { getTeamLogoPath } from "./utils/teamLogos";
 import { getProxiedImageUrl } from "./utils/imageProxy";
 import "./App.css";
@@ -38,6 +39,7 @@ function AppContent() {
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isPlayerDropdownOpen, setIsPlayerDropdownOpen] = useState(false);
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const playerDropdownRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -302,7 +304,9 @@ function AppContent() {
             >
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="w-full h-full flex items-center justify-center bg-transparent border-none outline-none"
+                className={`w-full h-full flex relative items-center justify-center bg-transparent border-none rounded-md transition-colors outline-none ${
+                  !fixed ? "hover:bg-gray-300" : ""
+                }`}
                 disabled={loading}
               >
                 <img
@@ -324,7 +328,7 @@ function AppContent() {
                   {/* Default NHL option */}
                   <button
                     onClick={() => handleDropdownTeamSelect(null)}
-                    className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-4 border-b border-gray-200 bg-transparent"
+                    className={`w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-4 border-b border-gray-200 bg-transparent `}
                   >
                     <div className="w-6 h-6 flex items-center justify-center">
                       <img
@@ -350,9 +354,9 @@ function AppContent() {
 
             {/* Player name container with constrained space */}
             <div
-              className={`flex flex-1 flex-col items-start min-w-0 ${
+              className={`flex flex-1 flex-col items-start min-w-0 rounded-t-md ${
                 fixed ? "h-16" : "h-8 sm:h-12 md:h-16 lg:h-18"
-              }`}
+              } ${fixed ? "" : roster.length === 0 ? "" : "hover:bg-gray-300"}`}
             >
               {/* Player Dropdown */}
               <div
@@ -537,13 +541,40 @@ function AppContent() {
 
   return (
     <div className="h-screen w-full flex flex-col items-center justify-start overflow-auto ">
-      <div className="fixed top-0 left-0 h-20 w-full p-2 bg-white text-black shadow-lg z-10 flex justify-around items-center">
-        <CardCount count={cardCount} />
-        <DownloadButton
-          selectedPlayer={selectedPlayer}
-          selectedTeam={selectedTeam || null}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-        />
+      <div className="fixed top-0 left-0 h-20 w-full p-2 bg-white text-black shadow-lg z-10 flex justify-center items-center">
+        <div className="w-full max-w-6xl flex justify-between items-center px-2">
+          <CardCount count={cardCount} />
+          <div className="flex items-center gap-2 sm:gap-4">
+            <button
+              onClick={() => setIsHelpModalOpen(true)}
+              className="px-2 py-2 sm:px-4 sm:py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium flex items-center gap-1 sm:gap-2"
+            >
+              <svg
+                className="w-4 h-4 sm:w-5 sm:h-5"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span className="hidden sm:inline">Help</span>
+            </button>
+            <DownloadButton
+              selectedPlayer={selectedPlayer}
+              selectedTeam={selectedTeam || null}
+              className="px-3 py-2 sm:px-6 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm sm:text-base"
+            >
+              <span className="sm:hidden">Download</span>
+              <span className="hidden sm:inline">Download Card</span>
+            </DownloadButton>
+          </div>
+        </div>
       </div>
       <div className="pt-24 px-1 sm:px-4 w-full flex justify-center">
         <PlayerCard />
@@ -576,6 +607,12 @@ function AppContent() {
       >
         <PlayerCard fixed={true} />
       </div>
+
+      {/* Help Modal */}
+      <HelpModal
+        isOpen={isHelpModalOpen}
+        onClose={() => setIsHelpModalOpen(false)}
+      />
     </div>
   );
 }
