@@ -300,6 +300,7 @@ This project is licensed under the MIT License
 
 ## 🙏 Acknowledgments
 
+- **JFresh** ([@JFreshHockey](https://twitter.com/JFreshHockey)) for the original stat card design inspiration
 - **NHL** for providing the official API
 - **React Team** for the amazing framework
 - **Vercel** for excellent serverless platform
